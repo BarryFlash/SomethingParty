@@ -13,6 +13,7 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include <SomethingParty/SomethingPartyGameMode.h>
+#include <SomethingParty/Public/TriggerableTileInterface.h>
 
 ASomethingPartyCharacter::ASomethingPartyCharacter()
 {
@@ -160,4 +161,9 @@ void ASomethingPartyCharacter::MoveAlongSpline(float Value)
 void ASomethingPartyCharacter::OnEndReached()
 {
 	moving = false;
+	//If tile is triggerable, then trigger action
+	if (currentTile->Implements<UTriggerableTileInterface>()) {
+		ITriggerableTileInterface* TriggerableTile = Cast<ITriggerableTileInterface>(currentTile);
+		TriggerableTile->triggerAction();
+	}
 }
