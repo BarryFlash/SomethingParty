@@ -8,8 +8,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/SplineComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
+#include <SomethingParty/SomethingPartyGameMode.h>
 
 ASomethingPartyCharacter::ASomethingPartyCharacter()
 {
@@ -40,6 +43,8 @@ ASomethingPartyCharacter::ASomethingPartyCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -48,4 +53,111 @@ ASomethingPartyCharacter::ASomethingPartyCharacter()
 void ASomethingPartyCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+	
+	if (MovementTimeline.IsPlaying()) {
+		MovementTimeline.TickTimeline(DeltaSeconds);
+	}
+}
+
+bool ASomethingPartyCharacter::isMoving()
+{
+	return moving;
+}
+
+float ASomethingPartyCharacter::getTileWalkSpeed()
+{
+	return TileWalkSpeed;
+}
+
+void ASomethingPartyCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//Bind timeline functions
+	FOnTimelineFloat ProgressTimeline;
+	ProgressTimeline.BindUFunction(this, TEXT("MoveAlongSpline"));
+	MovementTimeline.AddInterpFloat(MovementCurve, ProgressTimeline);
+	FOnTimelineEvent OnTimelineFinished;
+	OnTimelineFinished.BindUFunction(this, TEXT("OnEndReached"));
+	MovementTimeline.SetTimelineFinishedFunc(OnTimelineFinished);
+
+	//Get starting tile
+	ATileActor* newTile = Cast<ASomethingPartyGameMode>(UGameplayStatics::GetGameMode(this))->StartTile;
+	if (!newTile) {
+		UE_LOG(LogTemp, Fatal, TEXT("Missing start tile..."));
+	}
+	currentTile = newTile;
+
+	if (!MovementCurve) {
+		UE_LOG(LogTemp, Fatal, TEXT("Missing movement curve..."));
+	}
+
+	//Get spline
+	TArray<AActor*> ActorsToFind;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), FName("FindSpline"), ActorsToFind);
+	if (ActorsToFind.Num() != 1) {
+		UE_LOG(LogTemp, Fatal, TEXT("Only 1 spline actor in world allowed..."));
+	}
+	AActor* SplineActor = Cast<AActor>(ActorsToFind[0]);
+	if (!SplineActor) {
+		UE_LOG(LogTemp, Fatal, TEXT("No spline actor found..."));
+	}
+	if (SplineActor->GetComponentsByClass(USplineComponent::StaticClass()).Num() != 1) {
+		UE_LOG(LogTemp, Fatal, TEXT("No spline component found in spline actor..."));
+	}
+	USplineComponent* SplineComponent = Cast<USplineComponent>(SplineActor->GetComponentsByClass(USplineComponent::StaticClass())[0]);
+	if (!SplineComponent) {
+		UE_LOG(LogTemp, Fatal, TEXT("No spline component found in spline actor..."));
+	}
+	MovementSpline = SplineComponent;
+
+	//Test move
+	Move(20);
+}
+
+//Move character a given amount of tiles
+void ASomethingPartyCharacter::Move(int amount)
+{	
+	MovementSpline->ClearSplinePoints();
+	MovementSpline->bDrawDebug = true;
+	SetActorLocation(currentTile->GetActorLocation());
+	ATileActor* nextTilePoint = currentTile;
+	MovementSpline->AddSplinePoint(nextTilePoint->GetActorLocation(), ESplineCoordinateSpace::World, false); //Initial spline point
+	if (nextTilePoint->getNextTile() != NULL) { //More than 1 tile
+		nextTilePoint = nextTilePoint->getNextTile();
+		for (int i = 0; i < amount; i++) { 
+			MovementSpline->AddSplinePoint(nextTilePoint->GetActorLocation(), ESplineCoordinateSpace::World, false); //Add spline point for each tile
+			if (nextTilePoint->getNextTile() == NULL) { //If there is no tile after, end spline
+				break;
+			}
+			nextTilePoint = nextTilePoint->getNextTile(); //Set nextTilePoint to next tile
+		}
+	}
+	currentTile = nextTilePoint;
+	MovementSpline->UpdateSpline();
+
+	moving = true;
+
+	//Set proper play rate so it remains same speed no matter the length
+	float TimelineLength = MovementSpline->GetSplineLength() / (TileWalkSpeed);
+	MovementTimeline.SetPlayRate(1.f / TimelineLength);
+	MovementTimeline.Play();
+
+}
+
+//Called every tick while timeline is playing
+void ASomethingPartyCharacter::MoveAlongSpline(float Value)
+{
+	const float SplineLength = MovementSpline->GetSplineLength();
+
+	FVector CurrentSplineLocation = MovementSpline->GetLocationAtDistanceAlongSpline(Value * SplineLength, ESplineCoordinateSpace::World);
+	FRotator CurrentSplineRotation = MovementSpline->GetRotationAtDistanceAlongSpline(Value * SplineLength, ESplineCoordinateSpace::World);
+	
+	SetActorLocationAndRotation(CurrentSplineLocation, CurrentSplineRotation);
+}
+
+//Called when timeline ended
+void ASomethingPartyCharacter::OnEndReached()
+{
+	moving = false;
 }

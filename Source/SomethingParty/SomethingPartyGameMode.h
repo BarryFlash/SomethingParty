@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include <TileActor.h>
 #include "SomethingPartyGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -13,6 +14,12 @@ class ASomethingPartyGameMode : public AGameModeBase
 
 public:
 	ASomethingPartyGameMode();
+
+	UPROPERTY()
+	ATileActor* StartTile;
+
+protected:
+	virtual void StartPlay() override;
 };
 
 

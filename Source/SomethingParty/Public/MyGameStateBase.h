@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
+#include "TileActor.h"
 #include "MyGameStateBase.generated.h"
+
 
 /**
  * 
@@ -13,5 +15,7 @@ UCLASS()
 class SOMETHINGPARTY_API AMyGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
+
+protected:
 	
 };

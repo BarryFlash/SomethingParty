@@ -4,6 +4,8 @@
 #include "SomethingPartyPlayerController.h"
 #include "SomethingPartyCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 ASomethingPartyGameMode::ASomethingPartyGameMode()
 {
@@ -23,4 +25,32 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 	{
 		PlayerControllerClass = PlayerControllerBPClass.Class;
 	}
+
+	// set default state to our Blueprinted state
+	static ConstructorHelpers::FClassFinder<AGameStateBase> SomethingPartyGameState(TEXT("/Game/TopDown/Blueprints/MyGameStateBase"));
+	if (SomethingPartyGameState.Class != NULL)
+	{
+		GameStateClass = SomethingPartyGameState.Class;
+	}
+}
+
+void ASomethingPartyGameMode::StartPlay()
+{
+	
+	
+	TArray<AActor*> ActorsToFind;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), ATileActor::StaticClass(), FName("StartingTile"), ActorsToFind);
+
+	if (ActorsToFind.IsEmpty()) {
+		UE_LOG(LogTemp, Fatal, TEXT("Missing start tile..."));
+	}
+	for (AActor* TileActor : ActorsToFind) {
+		ATileActor* Tile = Cast<ATileActor>(TileActor);
+		if (Tile) {
+			StartTile = Tile;
+		}
+	}
+
+	AGameModeBase::StartPlay();
+
 }
