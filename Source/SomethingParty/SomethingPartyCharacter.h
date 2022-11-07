@@ -31,6 +31,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	float getTileWalkSpeed();
 
+	void Move(int amount);
+
 protected:
 	class USplineComponent* MovementSpline;
 
@@ -39,6 +41,9 @@ protected:
 	bool moving;
 	FTimeline MovementTimeline;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dice")
+		TSubclassOf<class ADice> DiceActor;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spline")
 	UCurveFloat* MovementCurve;
 
@@ -46,7 +51,6 @@ protected:
 	float TileWalkSpeed;
 
 	virtual void BeginPlay() override;
-	void Move(int amount);
 	UFUNCTION()
 	void MoveAlongSpline(float Value);
 	UFUNCTION()

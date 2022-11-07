@@ -14,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include <SomethingParty/SomethingPartyGameMode.h>
 #include <SomethingParty/Public/TriggerableTileInterface.h>
+#include <Dice.h>
 
 ASomethingPartyCharacter::ASomethingPartyCharacter()
 {
@@ -112,8 +113,6 @@ void ASomethingPartyCharacter::BeginPlay()
 	}
 	MovementSpline = SplineComponent;
 
-	//Test move
-	Move(20);
 }
 
 //Move character a given amount of tiles
@@ -128,13 +127,14 @@ void ASomethingPartyCharacter::Move(int amount)
 		nextTilePoint = nextTilePoint->getNextTile();
 		for (int i = 0; i < amount; i++) { 
 			MovementSpline->AddSplinePoint(nextTilePoint->GetActorLocation(), ESplineCoordinateSpace::World, false); //Add spline point for each tile
+			currentTile = nextTilePoint;
 			if (nextTilePoint->getNextTile() == NULL) { //If there is no tile after, end spline
 				break;
 			}
 			nextTilePoint = nextTilePoint->getNextTile(); //Set nextTilePoint to next tile
 		}
 	}
-	currentTile = nextTilePoint;
+	
 	MovementSpline->UpdateSpline();
 
 	moving = true;
@@ -142,7 +142,7 @@ void ASomethingPartyCharacter::Move(int amount)
 	//Set proper play rate so it remains same speed no matter the length
 	float TimelineLength = MovementSpline->GetSplineLength() / (TileWalkSpeed);
 	MovementTimeline.SetPlayRate(1.f / TimelineLength);
-	MovementTimeline.Play();
+	MovementTimeline.PlayFromStart();
 
 }
 
@@ -161,6 +161,16 @@ void ASomethingPartyCharacter::MoveAlongSpline(float Value)
 void ASomethingPartyCharacter::OnEndReached()
 {
 	moving = false;
+
+	//Spawn in Dice Above Player
+	if (DiceActor) {
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = this;
+
+	GetWorld()->SpawnActor<ADice>(DiceActor, GetActorLocation() + FVector(0, 0, 150), GetActorRotation(), spawnParams);
+
+	}
+
 	//If tile is triggerable, then trigger action
 	if (currentTile->Implements<UTriggerableTileInterface>()) {
 		ITriggerableTileInterface* TriggerableTile = Cast<ITriggerableTileInterface>(currentTile);
