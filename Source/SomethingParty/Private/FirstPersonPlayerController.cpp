@@ -1,47 +1,46 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SomethingPartyPlayerController.h"
-#include "GameFramework/Pawn.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "NiagaraSystem.h"
-#include "NiagaraFunctionLibrary.h"
-#include "SomethingPartyCharacter.h"
-#include "Engine/World.h"
+#include "FirstPersonPlayerController.h"
+#include "GameFramework/Character.h"
+#include "MinigamePlayerCameraManager.h"
 
-ASomethingPartyPlayerController::ASomethingPartyPlayerController()
+AFirstPersonPlayerController::AFirstPersonPlayerController()
 {
 	// set our turn rates for input
-	TurnRateGamepad = 45.f;
+	TurnRateGamepad = 50.f;
+}
 
-
+void AFirstPersonPlayerController::BeginPlay()
+{
+	
 }
 
 
-void ASomethingPartyPlayerController::SetupInputComponent()
+void AFirstPersonPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
 	// Bind jump events
-	InputComponent->BindAction("Jump", IE_Pressed, this, &ASomethingPartyPlayerController::Jump);
-	InputComponent->BindAction("Jump", IE_Released, this, &ASomethingPartyPlayerController::StopJumping);
+	InputComponent->BindAction("Jump", IE_Pressed, this, &AFirstPersonPlayerController::Jump);
+	InputComponent->BindAction("Jump", IE_Released, this, &AFirstPersonPlayerController::StopJumping);
 
 
 	// Bind movement events
-	InputComponent->BindAxis("Move Forward / Backward", this, &ASomethingPartyPlayerController::MoveForward);
-	InputComponent->BindAxis("Move Right / Left", this, &ASomethingPartyPlayerController::MoveRight);
+	InputComponent->BindAxis("Move Forward / Backward", this, &AFirstPersonPlayerController::MoveForward);
+	InputComponent->BindAxis("Move Right / Left", this, &AFirstPersonPlayerController::MoveRight);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "Mouse" versions handle devices that provide an absolute delta, such as a mouse.
 	// "Gamepad" versions are for devices that we choose to treat as a rate of change, such as an analog joystick
-	InputComponent->BindAxis("Turn Right / Left Mouse", this, &ASomethingPartyPlayerController::AddControllerYawInput);
-	InputComponent->BindAxis("Look Up / Down Mouse", this, &ASomethingPartyPlayerController::AddControllerPitchInput);
-	InputComponent->BindAxis("Turn Right / Left Gamepad", this, &ASomethingPartyPlayerController::TurnAtRate);
-	InputComponent->BindAxis("Look Up / Down Gamepad", this, &ASomethingPartyPlayerController::LookUpAtRate);
+	InputComponent->BindAxis("Turn Right / Left Mouse", this, &AFirstPersonPlayerController::AddControllerYawInput);
+	InputComponent->BindAxis("Look Up / Down Mouse", this, &AFirstPersonPlayerController::AddControllerPitchInput);
+	InputComponent->BindAxis("Turn Right / Left Gamepad", this, &AFirstPersonPlayerController::TurnAtRate);
+	InputComponent->BindAxis("Look Up / Down Gamepad", this, &AFirstPersonPlayerController::LookUpAtRate);
 
 }
 
-void ASomethingPartyPlayerController::MoveForward(float Value)
+void AFirstPersonPlayerController::MoveForward(float Value)
 {
 	if (Value != 0.0f)
 	{
@@ -59,7 +58,7 @@ void ASomethingPartyPlayerController::MoveForward(float Value)
 	}
 }
 
-void ASomethingPartyPlayerController::MoveRight(float Value)
+void AFirstPersonPlayerController::MoveRight(float Value)
 {
 	if (Value != 0.0f)
 	{
@@ -78,19 +77,19 @@ void ASomethingPartyPlayerController::MoveRight(float Value)
 	}
 }
 
-void ASomethingPartyPlayerController::TurnAtRate(float Rate)
+void AFirstPersonPlayerController::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerYawInput(Rate * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
 }
 
-void ASomethingPartyPlayerController::LookUpAtRate(float Rate)
+void AFirstPersonPlayerController::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
 }
 
-void ASomethingPartyPlayerController::Jump()
+void AFirstPersonPlayerController::Jump()
 {
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
@@ -99,7 +98,7 @@ void ASomethingPartyPlayerController::Jump()
 	}
 }
 
-void ASomethingPartyPlayerController::StopJumping()
+void AFirstPersonPlayerController::StopJumping()
 {
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
@@ -108,7 +107,7 @@ void ASomethingPartyPlayerController::StopJumping()
 	}
 }
 
-void ASomethingPartyPlayerController::AddControllerYawInput(float Val)
+void AFirstPersonPlayerController::AddControllerYawInput(float Val)
 {
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
@@ -117,7 +116,7 @@ void ASomethingPartyPlayerController::AddControllerYawInput(float Val)
 	}
 }
 
-void ASomethingPartyPlayerController::AddControllerPitchInput(float Val)
+void AFirstPersonPlayerController::AddControllerPitchInput(float Val)
 {
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
@@ -125,3 +124,5 @@ void ASomethingPartyPlayerController::AddControllerPitchInput(float Val)
 		MyPawn->AddControllerPitchInput(Val);
 	}
 }
+
+

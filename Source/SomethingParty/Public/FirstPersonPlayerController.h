@@ -1,31 +1,27 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
-#include "SomethingPartyPlayerController.generated.h"
+#include "FirstPersonPlayerController.generated.h"
 
-/** Forward declaration to improve compiling times */
-class UNiagaraSystem;
-
+/**
+ * 
+ */
 UCLASS()
-class ASomethingPartyPlayerController : public APlayerController
+class AFirstPersonPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-
 public:
-	ASomethingPartyPlayerController();
+	AFirstPersonPlayerController();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float TurnRateGamepad;
+		float TurnRateGamepad;
 
 
 protected:
-	/** True if the controlled character should navigate to the mouse cursor. */
-	uint32 bMoveToMouseCursor : 1;
 
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
@@ -64,12 +60,11 @@ protected:
 	 */
 	void AddControllerPitchInput(float Val);
 
-
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 private:
 	bool bInputPressed; // Input is bring pressed
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
 };
-
-
