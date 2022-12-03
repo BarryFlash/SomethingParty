@@ -7,6 +7,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "SomethingPartyCharacter.h"
 #include "Engine/World.h"
+#include <SomethingPartyGameState.h>
+#include "GameFramework/PlayerState.h"
 
 ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 {
@@ -28,16 +30,16 @@ void ASomethingPartyPlayerController::SetupInputComponent()
 
 
 	// Bind movement events
-	InputComponent->BindAxis("Move Forward / Backward", this, &ASomethingPartyPlayerController::MoveForward);
-	InputComponent->BindAxis("Move Right / Left", this, &ASomethingPartyPlayerController::MoveRight);
+	//InputComponent->BindAxis("Move Forward / Backward", this, &ASomethingPartyPlayerController::MoveForward);
+	//InputComponent->BindAxis("Move Right / Left", this, &ASomethingPartyPlayerController::MoveRight);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "Mouse" versions handle devices that provide an absolute delta, such as a mouse.
 	// "Gamepad" versions are for devices that we choose to treat as a rate of change, such as an analog joystick
-	InputComponent->BindAxis("Turn Right / Left Mouse", this, &ASomethingPartyPlayerController::AddControllerYawInput);
-	InputComponent->BindAxis("Look Up / Down Mouse", this, &ASomethingPartyPlayerController::AddControllerPitchInput);
-	InputComponent->BindAxis("Turn Right / Left Gamepad", this, &ASomethingPartyPlayerController::TurnAtRate);
-	InputComponent->BindAxis("Look Up / Down Gamepad", this, &ASomethingPartyPlayerController::LookUpAtRate);
+	//InputComponent->BindAxis("Turn Right / Left Mouse", this, &ASomethingPartyPlayerController::AddControllerYawInput);
+	//InputComponent->BindAxis("Look Up / Down Mouse", this, &ASomethingPartyPlayerController::AddControllerPitchInput);
+	//InputComponent->BindAxis("Turn Right / Left Gamepad", this, &ASomethingPartyPlayerController::TurnAtRate);
+	//InputComponent->BindAxis("Look Up / Down Gamepad", this, &ASomethingPartyPlayerController::LookUpAtRate);
 
 }
 
@@ -95,7 +97,9 @@ void ASomethingPartyPlayerController::Jump()
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
 	{
-		Cast<ACharacter>(MyPawn)->Jump();
+		if (Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->CurrentTurnPlayer == MyPawn->GetPlayerState() && !Cast<ASomethingPartyCharacter>(MyPawn)->isMoving()) {
+			Cast<ACharacter>(MyPawn)->Jump();
+		}
 	}
 }
 

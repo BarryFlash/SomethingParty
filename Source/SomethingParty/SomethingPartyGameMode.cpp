@@ -6,6 +6,8 @@
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
+#include <SomethingPartyGameState.h>
+#include "GameFramework/PlayerState.h"
 
 ASomethingPartyGameMode::ASomethingPartyGameMode()
 {
@@ -27,17 +29,50 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 	}
 
 	// set default state to our Blueprinted state
-	static ConstructorHelpers::FClassFinder<AGameStateBase> SomethingPartyGameState(TEXT("/Game/TopDown/Blueprints/MyGameStateBase"));
+	static ConstructorHelpers::FClassFinder<AGameStateBase> SomethingPartyGameState(TEXT("/Game/TopDown/Blueprints/SomethingPartyGameStateBP"));
 	if (SomethingPartyGameState.Class != NULL)
 	{
 		GameStateClass = SomethingPartyGameState.Class;
 	}
+
+	// set default state to our Blueprinted player state
+	static ConstructorHelpers::FClassFinder<APlayerState> SomethingPartyPlayerState(TEXT("/Game/TopDown/Blueprints/SomethingPartyPlayerStateBP"));
+	if (SomethingPartyPlayerState.Class != NULL)
+	{
+		PlayerStateClass = SomethingPartyPlayerState.Class;
+	}
 }
+
+void ASomethingPartyGameMode::NextTurn()
+{
+	ASomethingPartyGameState* MainGameState = Cast<ASomethingPartyGameState>(GameState);
+	if (MainGameState) {
+		MainGameState->NextTurn();
+	}
+}
+
+void ASomethingPartyGameMode::SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder)
+{
+	ASomethingPartyGameState* MainGameState = Cast<ASomethingPartyGameState>(GameState);
+	if (MainGameState) {
+		MainGameState->SetTurnOrder(IDOrder);
+	}
+}
+
+void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADice* Dice)
+{
+	GetGameState<ASomethingPartyGameState>()->RollDice(Character, Dice);
+}
+
+
+
+
 
 void ASomethingPartyGameMode::StartPlay()
 {
+
 	
-	
+
 	TArray<AActor*> ActorsToFind;
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), ATileActor::StaticClass(), FName("StartingTile"), ActorsToFind);
 
@@ -47,10 +82,8 @@ void ASomethingPartyGameMode::StartPlay()
 	for (AActor* TileActor : ActorsToFind) {
 		ATileActor* Tile = Cast<ATileActor>(TileActor);
 		if (Tile) {
-			StartTile = Tile;
+			GetGameState<ASomethingPartyGameState>()->StartTile = Tile;
 		}
 	}
-
 	AGameModeBase::StartPlay();
-
 }
