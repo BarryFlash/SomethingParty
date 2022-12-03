@@ -3,6 +3,10 @@
 
 #include "Dice.h"
 #include <SomethingParty/SomethingPartyCharacter.h>
+#include "GameFramework/PlayerState.h"
+#include <Runtime/Engine/Public/Net/UnrealNetwork.h>
+#include <SomethingParty/SomethingPartyGameMode.h>
+
 
 // Sets default values
 ADice::ADice()
@@ -15,6 +19,7 @@ ADice::ADice()
 	DiceMesh->SetCollisionProfileName(TEXT("BlockAll"));
 	SetRootComponent(DiceMesh);
 
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -26,21 +31,26 @@ void ADice::BeginPlay()
 	DiceMesh->OnComponentHit.AddDynamic(this, &ADice::OnHit);
 }
 
+void ADice::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADice, DiceNumber);
+}
+
 
 //Set DiceNumber to a random number 1-10
 void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	int DiceNumber = FMath::RandRange(1, 10);
-
 	ASomethingPartyCharacter* Character = Cast<ASomethingPartyCharacter>(OtherActor);
-
-	
 	if (Character) {
-		if (!Character->isMoving()) {
-			UE_LOG(LogTemp, Warning, TEXT("DICE NUMBER: %i"), DiceNumber);
-			Character->Move(DiceNumber);
-		}
+		if (HasAuthority())
+			Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode())->RollDice(Character, this);
+		//Character->Move(DiceNumber);
+		Destroy();
 	}
+	
+	
 }
 
 // Called every frame

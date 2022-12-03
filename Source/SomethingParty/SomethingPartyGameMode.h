@@ -15,8 +15,15 @@ class ASomethingPartyGameMode : public AGameModeBase
 public:
 	ASomethingPartyGameMode();
 
-	UPROPERTY()
-	ATileActor* StartTile;
+	
+
+	
+	void NextTurn();
+	void SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder);
+
+	void RollDice(class ASomethingPartyCharacter* Character, class ADice* Dice);
+
+
 
 protected:
 	virtual void StartPlay() override;

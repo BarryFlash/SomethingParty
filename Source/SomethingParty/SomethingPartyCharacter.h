@@ -25,24 +25,29 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-	UFUNCTION(BlueprintCallable, Category="Movement")
+	UFUNCTION(BlueprintCallable, Category = "Movement")
 	bool isMoving();
 
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	float getTileWalkSpeed();
 
-	void Move(int amount);
+	void CreateMoveSpline(ATileActor* SplineStartTile, int amount);
+	void Move();
+
+	ATileActor* CurrentTile;
+
+	
 
 protected:
 	class USplineComponent* MovementSpline;
 
-	ATileActor* currentTile;
 
+	
+	UPROPERTY(Replicated)
 	bool moving;
 	FTimeline MovementTimeline;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dice")
-		TSubclassOf<class ADice> DiceActor;
+	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spline")
 	UCurveFloat* MovementCurve;

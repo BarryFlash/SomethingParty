@@ -15,9 +15,17 @@
 #include <SomethingParty/SomethingPartyGameMode.h>
 #include <SomethingParty/Public/TriggerableTileInterface.h>
 #include <Dice.h>
+#include <SomethingPartyGameState.h>
+#include <SomethingPartyPlayerState.h>
+#include "GameFramework/PlayerState.h"
+#include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 
 ASomethingPartyCharacter::ASomethingPartyCharacter()
 {
+	//Set up Replication
+	bReplicates = true;
+	SetReplicateMovement(true);
+
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -71,6 +79,8 @@ float ASomethingPartyCharacter::getTileWalkSpeed()
 	return TileWalkSpeed;
 }
 
+
+
 void ASomethingPartyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -83,12 +93,13 @@ void ASomethingPartyCharacter::BeginPlay()
 	OnTimelineFinished.BindUFunction(this, TEXT("OnEndReached"));
 	MovementTimeline.SetTimelineFinishedFunc(OnTimelineFinished);
 
+
 	//Get starting tile
-	ATileActor* newTile = Cast<ASomethingPartyGameMode>(UGameplayStatics::GetGameMode(this))->StartTile;
+	ATileActor* newTile = Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->StartTile;
 	if (!newTile) {
 		UE_LOG(LogTemp, Fatal, TEXT("Missing start tile..."));
 	}
-	currentTile = newTile;
+	CurrentTile = newTile;
 
 	if (!MovementCurve) {
 		UE_LOG(LogTemp, Fatal, TEXT("Missing movement curve..."));
@@ -113,31 +124,35 @@ void ASomethingPartyCharacter::BeginPlay()
 	}
 	MovementSpline = SplineComponent;
 
-}
 
-//Move character a given amount of tiles
-void ASomethingPartyCharacter::Move(int amount)
-{	
+}
+void ASomethingPartyCharacter::CreateMoveSpline(ATileActor* SplineStartTile, int amount)
+{
 	MovementSpline->ClearSplinePoints();
 	MovementSpline->bDrawDebug = true;
-	SetActorLocation(currentTile->GetActorLocation());
-	ATileActor* nextTilePoint = currentTile;
+	ATileActor* nextTilePoint = SplineStartTile;
 	MovementSpline->AddSplinePoint(nextTilePoint->GetActorLocation(), ESplineCoordinateSpace::World, false); //Initial spline point
 	if (nextTilePoint->getNextTile() != NULL) { //More than 1 tile
 		nextTilePoint = nextTilePoint->getNextTile();
-		for (int i = 0; i < amount; i++) { 
+		for (int i = 0; i < amount; i++) {
 			MovementSpline->AddSplinePoint(nextTilePoint->GetActorLocation(), ESplineCoordinateSpace::World, false); //Add spline point for each tile
-			currentTile = nextTilePoint;
+			CurrentTile = nextTilePoint;
 			if (nextTilePoint->getNextTile() == NULL) { //If there is no tile after, end spline
 				break;
 			}
 			nextTilePoint = nextTilePoint->getNextTile(); //Set nextTilePoint to next tile
 		}
 	}
-	
+
 	MovementSpline->UpdateSpline();
+}
+//Move character a given amount of tiles
+void ASomethingPartyCharacter::Move()
+{	
+	
 
 	moving = true;
+
 
 	//Set proper play rate so it remains same speed no matter the length
 	float TimelineLength = MovementSpline->GetSplineLength() / (TileWalkSpeed);
@@ -145,6 +160,8 @@ void ASomethingPartyCharacter::Move(int amount)
 	MovementTimeline.PlayFromStart();
 
 }
+
+
 
 //Called every tick while timeline is playing
 void ASomethingPartyCharacter::MoveAlongSpline(float Value)
@@ -154,6 +171,7 @@ void ASomethingPartyCharacter::MoveAlongSpline(float Value)
 	FVector CurrentSplineLocation = MovementSpline->GetLocationAtDistanceAlongSpline(Value * SplineLength, ESplineCoordinateSpace::World);
 	FRotator CurrentSplineRotation = MovementSpline->GetRotationAtDistanceAlongSpline(Value * SplineLength, ESplineCoordinateSpace::World);
 	
+	
 	SetActorLocationAndRotation(CurrentSplineLocation, CurrentSplineRotation);
 }
 
@@ -162,18 +180,20 @@ void ASomethingPartyCharacter::OnEndReached()
 {
 	moving = false;
 
-	//Spawn in Dice Above Player
-	if (DiceActor) {
-	FActorSpawnParameters spawnParams;
-	spawnParams.Owner = this;
-
-	GetWorld()->SpawnActor<ADice>(DiceActor, GetActorLocation() + FVector(0, 0, 150), GetActorRotation(), spawnParams);
-
-	}
+	
 
 	//If tile is triggerable, then trigger action
-	if (currentTile->Implements<UTriggerableTileInterface>()) {
-		ITriggerableTileInterface* TriggerableTile = Cast<ITriggerableTileInterface>(currentTile);
+	if (CurrentTile->Implements<UTriggerableTileInterface>()) {
+		ITriggerableTileInterface* TriggerableTile = Cast<ITriggerableTileInterface>(CurrentTile);
 		TriggerableTile->triggerAction();
 	}
+	ASomethingPartyGameState* gs = Cast<ASomethingPartyGameState>(GetWorld()->GetGameState());
+	gs->NextTurn();
+}
+
+void ASomethingPartyCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASomethingPartyCharacter, moving);
 }
