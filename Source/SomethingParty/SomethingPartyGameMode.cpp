@@ -7,6 +7,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include <SomethingPartyGameState.h>
+#include <Dice.h>
 #include "GameFramework/PlayerState.h"
 
 ASomethingPartyGameMode::ASomethingPartyGameMode()
@@ -98,7 +99,7 @@ void ASomethingPartyGameMode::StartPlay()
 		UE_LOG(LogTemp, Warning, TEXT("CURRENT PLAYER: %s"), *GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPlayerName());
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn();
-		UE_LOG(LogTemp, Warning, TEXT("CURRENT WORLD: %s"), *GetWorld()->GetMapName());
+		UE_LOG(LogTemp, Warning, TEXT("DICE ACTOR: %s"), *DiceActor);
 		GetWorld()->SpawnActor<ADice>(DiceActor, GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
 }
