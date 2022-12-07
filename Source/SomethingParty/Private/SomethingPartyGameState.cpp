@@ -23,6 +23,8 @@ ASomethingPartyGameState::ASomethingPartyGameState()
 void ASomethingPartyGameState::NextTurn()
 {
 	CurrentTurn += 1;
+	UE_LOG(LogTemp, Warning, TEXT("CURRENT TURN: %d"), CurrentTurn);
+	UE_LOG(LogTemp, Warning, TEXT("TURN ORDER: %d"), TurnOrder.Num());
 	if (HasAuthority() && CurrentTurn % TurnOrder.Num() == 0) {
 		GetWorld()->ServerTravel("/Game/TopDown/Maps/FloorIsLavaMap?listen");
 	}
@@ -51,7 +53,7 @@ void ASomethingPartyGameState::SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder)
 {
 	TArray<int> NewTurnOrder;
 	const TArray<APlayerState*>& Players = PlayerArray;
-	for (int32 Index = 0; Index != Players.Num(); ++Index)
+	for (int32 Index = 0; Index < Players.Num(); ++Index)
 	{
 		for (int32 IDIndex = 0; IDIndex != Players.Num(); ++IDIndex) {
 			if (Players[Index] && Players[Index]->GetUniqueId() == IDOrder[IDIndex])
@@ -71,17 +73,17 @@ void ASomethingPartyGameState::HandleBeginPlay()
 	
 	CurrentTurnPlayer = PlayerArray[0];
 	CurrentTurnPlayer->GetPawn()->SetActorLocation(StartTile->GetActorLocation());
-	if (DiceActor) {
+	/*if (DiceActor) {
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = CurrentTurnPlayer->GetPawn();
 		GetWorld()->SpawnActor<ADice>(DiceActor, CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
-	}
+	}*/
 }
 
 void ASomethingPartyGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
-
+	UE_LOG(LogTemp, Warning, TEXT("NEW PLAYER: %s"), *PlayerState->GetPlayerName());
 	TurnOrder.Add(PlayerArray.Num() - 1);
 }
 
