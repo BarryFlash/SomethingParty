@@ -98,6 +98,7 @@ void ASomethingPartyGameMode::StartPlay()
 		UE_LOG(LogTemp, Warning, TEXT("CURRENT PLAYER: %s"), *GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPlayerName());
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn();
+		UE_LOG(LogTemp, Warning, TEXT("CURRENT WORLD: %s"), *GetWorld()->GetMapName());
 		GetWorld()->SpawnActor<ADice>(DiceActor, GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
 }
