@@ -41,6 +41,12 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 	{
 		PlayerStateClass = SomethingPartyPlayerState.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<ADice> Dice(TEXT("/Game/TopDown/Blueprints/DiceBP"));
+	if (Dice.Class != NULL)
+	{
+		DiceActor = Dice.Class;
+	}
 }
 
 void ASomethingPartyGameMode::NextTurn()
@@ -84,6 +90,12 @@ void ASomethingPartyGameMode::StartPlay()
 		if (Tile) {
 			GetGameState<ASomethingPartyGameState>()->StartTile = Tile;
 		}
+	}
+	GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer = GetGameState<ASomethingPartyGameState>()->PlayerArray[0];
+	if (DiceActor) {
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn();
+		GetWorld()->SpawnActor<ADice>(DiceActor, GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
 	AGameModeBase::StartPlay();
 }

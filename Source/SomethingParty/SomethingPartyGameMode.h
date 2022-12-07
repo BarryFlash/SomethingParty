@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include <TileActor.h>
+#include <Dice.h>
 #include "SomethingPartyGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -16,7 +17,8 @@ public:
 	ASomethingPartyGameMode();
 
 	
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dice")
+	TSubclassOf<ADice> DiceActor;
 	
 	void NextTurn();
 	void SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder);

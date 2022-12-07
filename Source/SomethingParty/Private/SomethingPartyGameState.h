@@ -34,8 +34,7 @@ public:
 	UPROPERTY(Replicated)
 	ATileActor* StartTile;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dice")
-		TSubclassOf<ADice> DiceActor;
+	
 	
 	void NextTurn();
 	void SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder);

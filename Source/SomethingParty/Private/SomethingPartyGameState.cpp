@@ -8,16 +8,13 @@
 #include <Dice.h>
 #include <SomethingParty/SomethingPartyCharacter.h>
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
+#include <SomethingParty/SomethingPartyGameMode.h>
 
 
 
 ASomethingPartyGameState::ASomethingPartyGameState()
 {
-	static ConstructorHelpers::FClassFinder<ADice> Dice(TEXT("/Game/TopDown/Blueprints/DiceBP"));
-	if (Dice.Class != NULL)
-	{
-		DiceActor = Dice.Class;
-	}
+	
 }
 
 void ASomethingPartyGameState::NextTurn()
@@ -35,11 +32,11 @@ void ASomethingPartyGameState::NextTurn()
 			ASomethingPartyCharacter* Character = Cast<ASomethingPartyCharacter>(CurrentTurnPlayer->GetPawn());
 			Character->SetActorLocation(Character->CurrentTile->GetActorLocation());
 			//Spawn in Dice Above Player
-
-			if (DiceActor) {
+			
+			if (GetDefaultGameMode<ASomethingPartyGameMode>()->DiceActor) {
 				FActorSpawnParameters spawnParams;
 				spawnParams.Owner = CurrentTurnPlayer->GetPawn();
-				GetWorld()->SpawnActor<ADice>(DiceActor, Character->GetActorLocation() + FVector(0, 0, 150), Character->GetActorRotation(), spawnParams);
+				GetWorld()->SpawnActor<ADice>(GetDefaultGameMode<ASomethingPartyGameMode>()->DiceActor, Character->GetActorLocation() + FVector(0, 0, 150), Character->GetActorRotation(), spawnParams);
 			}
 
 			for (APlayerState* State : PlayerArray) {
@@ -73,11 +70,7 @@ void ASomethingPartyGameState::HandleBeginPlay()
 	
 	CurrentTurnPlayer = PlayerArray[0];
 	CurrentTurnPlayer->GetPawn()->SetActorLocation(StartTile->GetActorLocation());
-	/*if (DiceActor) {
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = CurrentTurnPlayer->GetPawn();
-		GetWorld()->SpawnActor<ADice>(DiceActor, CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
-	}*/
+	
 }
 
 void ASomethingPartyGameState::AddPlayerState(APlayerState* PlayerState)
