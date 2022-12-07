@@ -11,6 +11,15 @@
 
 
 
+ASomethingPartyGameState::ASomethingPartyGameState()
+{
+	static ConstructorHelpers::FClassFinder<ADice> Dice(TEXT("/Game/TopDown/Blueprints/DiceBP"));
+	if (Dice.Class != NULL)
+	{
+		DiceActor = Dice.Class;
+	}
+}
+
 void ASomethingPartyGameState::NextTurn()
 {
 	CurrentTurn += 1;

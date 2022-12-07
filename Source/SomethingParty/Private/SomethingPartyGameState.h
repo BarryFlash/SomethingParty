@@ -18,6 +18,8 @@ class ASomethingPartyGameState : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+	ASomethingPartyGameState();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Board)
 		int MaxTurns;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Board)
