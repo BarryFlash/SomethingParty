@@ -62,16 +62,6 @@ void ASomethingPartyGameState::SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder)
 	TurnOrder = NewTurnOrder;
 }
 
-void ASomethingPartyGameState::HandleBeginPlay()
-{
-
-	
-	Super::HandleBeginPlay();
-	
-	CurrentTurnPlayer = PlayerArray[0];
-	CurrentTurnPlayer->GetPawn()->SetActorLocation(StartTile->GetActorLocation());
-	
-}
 
 void ASomethingPartyGameState::AddPlayerState(APlayerState* PlayerState)
 {
