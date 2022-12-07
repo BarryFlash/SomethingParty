@@ -91,6 +91,8 @@ void ASomethingPartyGameMode::StartPlay()
 			GetGameState<ASomethingPartyGameState>()->StartTile = Tile;
 		}
 	}
+	
+	AGameModeBase::StartPlay();
 	GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer = GetGameState<ASomethingPartyGameState>()->PlayerArray[0];
 	if (DiceActor) {
 		UE_LOG(LogTemp, Warning, TEXT("CURRENT PLAYER: %s"), *GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPlayerName());
@@ -98,5 +100,4 @@ void ASomethingPartyGameMode::StartPlay()
 		spawnParams.Owner = GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn();
 		GetWorld()->SpawnActor<ADice>(DiceActor, GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
-	AGameModeBase::StartPlay();
 }
