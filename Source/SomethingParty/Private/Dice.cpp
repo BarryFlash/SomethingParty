@@ -30,9 +30,6 @@ void ADice::BeginPlay()
 
 	//Call the OnHit Function
 	DiceMesh->OnComponentHit.AddDynamic(this, &ADice::OnHit);
-
-	UE_LOG(LogTemp, Warning, TEXT("OWNER: %s"), *GetOwner()->GetName());
-	GetOwner<ASomethingPartyCharacter>()->GetPlayerState<ASomethingPartyPlayerState>()->WaitingToRoll = true;
 }
 
 void ADice::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
