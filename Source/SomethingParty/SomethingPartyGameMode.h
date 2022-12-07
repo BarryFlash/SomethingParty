@@ -28,7 +28,7 @@ public:
 
 	bool DecidingTurns;
 
-	TMap<int, ASomethingPartyPlayerState*> StartingTurnOrder;
+	TMultiMap<int, ASomethingPartyPlayerState*> StartingTurnOrder;
 
 protected:
 	virtual void StartPlay() override;

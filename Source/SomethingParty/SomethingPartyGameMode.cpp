@@ -13,6 +13,7 @@
 
 ASomethingPartyGameMode::ASomethingPartyGameMode()
 {
+	bUseSeamlessTravel = true;
 	// use our custom PlayerController class
 	PlayerControllerClass = ASomethingPartyPlayerController::StaticClass();
 
@@ -79,7 +80,7 @@ void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADic
 				StartingTurnOrder.Add(DiceNumber, Character->GetPlayerState<ASomethingPartyPlayerState>());
 				if (StartingTurnOrder.Num() == GetGameState<ASomethingPartyGameState>()->PlayerArray.Num()) {
 					StartingTurnOrder.KeySort([](int A, int B) {
-						return A < B;
+						return A > B;
 					});
 					TArray<ASomethingPartyPlayerState*> NewTurnOrder;
 					for (auto& Elem : StartingTurnOrder) {
