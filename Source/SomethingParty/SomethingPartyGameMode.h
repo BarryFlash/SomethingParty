@@ -25,10 +25,13 @@ public:
 
 	void RollDice(class ASomethingPartyCharacter* Character, class ADice* Dice);
 
+	
 
 
 protected:
 	virtual void StartPlay() override;
+
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 };
 
 

@@ -74,7 +74,6 @@ void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADic
 
 
 
-
 void ASomethingPartyGameMode::StartPlay()
 {
 
@@ -95,12 +94,16 @@ void ASomethingPartyGameMode::StartPlay()
 	
 	AGameModeBase::StartPlay();
 	GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer = GetGameState<ASomethingPartyGameState>()->PlayerArray[0];
-	if (DiceActor) {
-		UE_LOG(LogTemp, Warning, TEXT("CURRENT PLAYER: %s"), *GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPlayerName());
+}
+
+void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	if (DiceActor && NewPlayer->GetPawn()) {
 		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn();
+		spawnParams.Owner = NewPlayer->GetPawn();
 		UE_LOG(LogTemp, Warning, TEXT("DICE ACTOR: %s"), *DiceActor);
-		GetWorld()->SpawnActor<ADice>(DiceActor);
-		//GetWorld()->SpawnActor<ADice>(DiceActor, GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
+		GetWorld()->SpawnActor<ADice>(DiceActor, NewPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), NewPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
 }
