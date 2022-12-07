@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 #include <SomethingParty/SomethingPartyGameMode.h>
+#include <SomethingPartyPlayerState.h>
 
 
 // Sets default values
@@ -29,6 +30,9 @@ void ADice::BeginPlay()
 
 	//Call the OnHit Function
 	DiceMesh->OnComponentHit.AddDynamic(this, &ADice::OnHit);
+
+	UE_LOG(LogTemp, Warning, TEXT("OWNER: %s"), *GetOwner()->GetName());
+	GetOwner<ASomethingPartyCharacter>()->GetPlayerState<ASomethingPartyPlayerState>()->WaitingToRoll = true;
 }
 
 void ADice::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -46,7 +50,10 @@ void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 	if (Character) {
 		if (HasAuthority())
 			Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode())->RollDice(Character, this);
-		//Character->Move(DiceNumber);
+		ASomethingPartyPlayerState* playerState = Character->GetPlayerState<ASomethingPartyPlayerState>();
+		if (playerState->WaitingToRoll) {
+			playerState->WaitingToRoll = false;
+		}
 		Destroy();
 	}
 	

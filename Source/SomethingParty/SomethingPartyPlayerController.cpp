@@ -9,6 +9,7 @@
 #include "Engine/World.h"
 #include <SomethingPartyGameState.h>
 #include "GameFramework/PlayerState.h"
+#include <SomethingPartyPlayerState.h>
 
 ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 {
@@ -97,9 +98,9 @@ void ASomethingPartyPlayerController::Jump()
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
 	{
-		if (Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->CurrentTurnPlayer == MyPawn->GetPlayerState() && !Cast<ASomethingPartyCharacter>(MyPawn)->isMoving()) {
+		//if (GetPlayerState<ASomethingPartyPlayerState>()->WaitingToRoll  && !Cast<ASomethingPartyCharacter>(MyPawn)->isMoving()) {
 			Cast<ACharacter>(MyPawn)->Jump();
-		}
+		//}
 	}
 }
 

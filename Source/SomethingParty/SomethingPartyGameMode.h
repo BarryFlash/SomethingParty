@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include <TileActor.h>
 #include <Dice.h>
+#include <SomethingPartyPlayerState.h>
 #include "SomethingPartyGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -21,12 +22,13 @@ public:
 	TSubclassOf<ADice> DiceActor;
 	
 	void NextTurn();
-	void SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder);
+	void SetTurnOrder(TArray<ASomethingPartyPlayerState*> Order);
 
 	void RollDice(class ASomethingPartyCharacter* Character, class ADice* Dice);
 
-	
+	bool DecidingTurns;
 
+	TMap<int, ASomethingPartyPlayerState*> StartingTurnOrder;
 
 protected:
 	virtual void StartPlay() override;
