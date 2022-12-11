@@ -8,8 +8,14 @@
 #include <Dice.h>
 #include <SomethingParty/SomethingPartyCharacter.h>
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
+#include <SomethingParty/SomethingPartyGameMode.h>
 
 
+
+ASomethingPartyGameState::ASomethingPartyGameState()
+{
+	
+}
 
 void ASomethingPartyGameState::NextTurn()
 {
@@ -19,16 +25,16 @@ void ASomethingPartyGameState::NextTurn()
 	}
 	else {
 		if (HasAuthority()) {
-			CurrentTurnPlayer = PlayerArray[TurnOrder[CurrentTurn % TurnOrder.Num()]];
+			CurrentTurnPlayer = TurnOrder[CurrentTurn % TurnOrder.Num()];
 
 			ASomethingPartyCharacter* Character = Cast<ASomethingPartyCharacter>(CurrentTurnPlayer->GetPawn());
 			Character->SetActorLocation(Character->CurrentTile->GetActorLocation());
 			//Spawn in Dice Above Player
-
-			if (DiceActor) {
+			
+			if (GetDefaultGameMode<ASomethingPartyGameMode>()->DiceActor) {
 				FActorSpawnParameters spawnParams;
 				spawnParams.Owner = CurrentTurnPlayer->GetPawn();
-				GetWorld()->SpawnActor<ADice>(DiceActor, Character->GetActorLocation() + FVector(0, 0, 150), Character->GetActorRotation(), spawnParams);
+				GetWorld()->SpawnActor<ADice>(GetDefaultGameMode<ASomethingPartyGameMode>()->DiceActor, Character->GetActorLocation() + FVector(0, 0, 150), Character->GetActorRotation(), spawnParams);
 			}
 
 			for (APlayerState* State : PlayerArray) {
@@ -38,42 +44,17 @@ void ASomethingPartyGameState::NextTurn()
 	}
 }
 
-void ASomethingPartyGameState::SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder)
+void ASomethingPartyGameState::SetTurnOrder_Implementation(const TArray<ASomethingPartyPlayerState*>& Order)
 {
-	TArray<int> NewTurnOrder;
-	const TArray<APlayerState*>& Players = PlayerArray;
-	for (int32 Index = 0; Index != Players.Num(); ++Index)
-	{
-		for (int32 IDIndex = 0; IDIndex != Players.Num(); ++IDIndex) {
-			if (Players[Index] && Players[Index]->GetUniqueId() == IDOrder[IDIndex])
-			{
-				NewTurnOrder.Insert(Index, IDIndex);
-			}
-		}
-	}
-	TurnOrder = NewTurnOrder;
+	TurnOrder = Order;
+	CurrentTurnPlayer = TurnOrder[0];
+	CurrentTurnPlayer->WaitingToRoll = true;
 }
 
-void ASomethingPartyGameState::HandleBeginPlay()
-{
-
-	
-	Super::HandleBeginPlay();
-	
-	CurrentTurnPlayer = PlayerArray[0];
-	CurrentTurnPlayer->GetPawn()->SetActorLocation(StartTile->GetActorLocation());
-	if (DiceActor) {
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = CurrentTurnPlayer->GetPawn();
-		GetWorld()->SpawnActor<ADice>(DiceActor, CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
-	}
-}
 
 void ASomethingPartyGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
-
-	TurnOrder.Add(PlayerArray.Num() - 1);
 }
 
 void ASomethingPartyGameState::RollDice(ASomethingPartyCharacter* Character, ADice* Dice)

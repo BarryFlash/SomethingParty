@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 #include <SomethingParty/SomethingPartyGameMode.h>
+#include <SomethingPartyPlayerState.h>
 
 
 // Sets default values
@@ -46,7 +47,10 @@ void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 	if (Character) {
 		if (HasAuthority())
 			Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode())->RollDice(Character, this);
-		//Character->Move(DiceNumber);
+		ASomethingPartyPlayerState* playerState = Character->GetPlayerState<ASomethingPartyPlayerState>();
+		if (playerState->WaitingToRoll) {
+			playerState->WaitingToRoll = false;
+		}
 		Destroy();
 	}
 	

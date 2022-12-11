@@ -17,7 +17,10 @@ class ASomethingPartyPlayerState : public APlayerState
 	
 public:
 	ADice* Dice;
+	bool WaitingToRoll;
+
+
 protected:
 
-	
+	virtual void BeginPlay() override;
 };
