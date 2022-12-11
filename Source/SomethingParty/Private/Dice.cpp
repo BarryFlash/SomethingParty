@@ -7,6 +7,9 @@
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 #include <SomethingParty/SomethingPartyGameMode.h>
 #include <SomethingPartyPlayerState.h>
+#include "Components/TextBlock.h"
+#include <DiceNumberWidget.h>
+#include <SomethingPartyPlayerState.h>
 
 
 // Sets default values
@@ -15,10 +18,12 @@ ADice::ADice()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
 	//Crates a Static Mesh Component
-	DiceMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Dice Mesh"));
+	DiceMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Dice Mesh"));
 	DiceMesh->SetCollisionProfileName(TEXT("BlockAll"));
-	SetRootComponent(DiceMesh);
+	DiceMesh->SetupAttachment(RootComponent);
 
 	bReplicates = true;
 }
@@ -48,9 +53,15 @@ void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 		if (HasAuthority())
 			Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode())->RollDice(Character, this);
 		ASomethingPartyPlayerState* playerState = Character->GetPlayerState<ASomethingPartyPlayerState>();
+		UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(Character->GetDiceNumberWidget()->GetWidget());
+		if (DiceNumWidget->DiceNumberText) {
+			DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(DiceNumber)));
+			DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
+		}
 		if (playerState->WaitingToRoll) {
 			playerState->WaitingToRoll = false;
 		}
+		
 		Destroy();
 	}
 	

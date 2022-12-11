@@ -2,8 +2,9 @@
 
 
 #include "MinigameTileActor.h"
+#include <SomethingParty/SomethingPartyCharacter.h>
 
-void AMinigameTileActor::triggerAction()
+void AMinigameTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 {
 	UE_LOG(LogTemp, Warning, TEXT("MINIGAME ACTIVE"));
 }

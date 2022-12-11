@@ -2,7 +2,8 @@
 
 
 #include "TriggerableTileInterface.h"
+#include <SomethingParty/SomethingPartyCharacter.h>
 
-void ITriggerableTileInterface::triggerAction()
+void ITriggerableTileInterface::TriggerAction(ASomethingPartyCharacter* Character)
 {
 }

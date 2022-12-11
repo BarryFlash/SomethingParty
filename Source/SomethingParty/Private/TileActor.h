@@ -26,6 +26,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	ATileActor* getNextTile();
+	virtual ATileActor* getNextTile();
 
 };

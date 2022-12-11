@@ -7,6 +7,7 @@
 #include <TileActor.h>
 #include <Dice.h>
 #include <SomethingPartyPlayerState.h>
+#include <SomethingParty/SomethingPartyCharacter.h>
 #include "SomethingPartyGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -24,7 +25,7 @@ public:
 	void NextTurn();
 	void SetTurnOrder(TArray<ASomethingPartyPlayerState*> Order);
 
-	void RollDice(class ASomethingPartyCharacter* Character, class ADice* Dice);
+	void RollDice(ASomethingPartyCharacter* Character, class ADice* Dice);
 
 	bool DecidingTurns;
 
@@ -32,8 +33,12 @@ public:
 
 protected:
 	virtual void StartPlay() override;
-
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
+	FTimerHandle DelayTimerHandle;
+
+	UFUNCTION()
+	void AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber);
 };
 
 

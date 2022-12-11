@@ -10,6 +10,7 @@
 #include <Dice.h>
 #include "GameFramework/PlayerState.h"
 #include <SomethingPartyPlayerState.h>
+#include <DiceNumberWidget.h>
 
 ASomethingPartyGameMode::ASomethingPartyGameMode()
 {
@@ -45,7 +46,7 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 		PlayerStateClass = SomethingPartyPlayerState.Class;
 	}
 
-	static ConstructorHelpers::FClassFinder<ADice> Dice(TEXT("/Game/TopDown/Blueprints/DiceBP"));
+	static ConstructorHelpers::FClassFinder<ADice> Dice(TEXT("/Game/TopDown/Blueprints/DiceActorBP"));
 	if (Dice.Class != NULL)
 	{
 		DiceActor = Dice.Class;
@@ -74,36 +75,45 @@ void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADic
 		if (!Character->isMoving()) {
 			int DiceNumber = FMath::RandRange(1, 10);
 			Dice->DiceNumber = DiceNumber;
-			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Dice Number: %d"), DiceNumber));
-			if (DecidingTurns) {
-				StartingTurnOrder.Add(DiceNumber, Character->GetPlayerState<ASomethingPartyPlayerState>());
-				if (StartingTurnOrder.Num() == GetGameState<ASomethingPartyGameState>()->PlayerArray.Num()) {
-					StartingTurnOrder.KeySort([](int A, int B) {
-						return A > B;
-					});
-					TArray<ASomethingPartyPlayerState*> NewTurnOrder;
-					for (auto& Elem : StartingTurnOrder) {
-						NewTurnOrder.Add(Elem.Value);
-					}
-					SetTurnOrder(NewTurnOrder);
-					DecidingTurns = false;
-					GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPlayerController()->GetCharacter()->SetActorLocation(GetGameState<ASomethingPartyGameState>()->StartTile->GetActorLocation());
-					FActorSpawnParameters spawnParams;
-					spawnParams.Owner = GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn();
-					GetWorld()->SpawnActor<ADice>(DiceActor, GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
-
-				}
-			} else {
-				ATileActor* CurrentTile = Character->CurrentTile;
-				Character->CreateMoveSpline(CurrentTile, DiceNumber);
-				GetGameState<ASomethingPartyGameState>()->MulticastMove(Character, CurrentTile, DiceNumber);
-			}
+			FTimerDelegate Delegate;
+			Delegate.BindUFunction(this, "AfterRollDice", Character, DiceNumber);
+			GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
+			
 		}
 	}
 }
 
+void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber)
+{
+	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(Character->GetDiceNumberWidget()->GetWidget());
+	if (DiceNumWidget->DiceNumberText) {
+		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	if (DecidingTurns) {
+		StartingTurnOrder.Add(DiceNumber, Character->GetPlayerState<ASomethingPartyPlayerState>());
+		if (StartingTurnOrder.Num() == GetGameState<ASomethingPartyGameState>()->PlayerArray.Num()) {
+			StartingTurnOrder.KeySort([](int A, int B) {
+				return A > B;
+				});
+			TArray<ASomethingPartyPlayerState*> NewTurnOrder;
+			for (auto& Elem : StartingTurnOrder) {
+				NewTurnOrder.Add(Elem.Value);
+			}
+			SetTurnOrder(NewTurnOrder);
+			DecidingTurns = false;
+			GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPlayerController()->GetCharacter()->SetActorLocation(GetGameState<ASomethingPartyGameState>()->StartTile->GetActorLocation());
+			FActorSpawnParameters spawnParams;
+			spawnParams.Owner = GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn();
+			GetWorld()->SpawnActor<ADice>(DiceActor, GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 180), GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
 
+		}
+	}
+	else {
+		ATileActor* CurrentTile = Character->CurrentTile;
+		Character->CreateMoveSpline(CurrentTile, DiceNumber);
+		GetGameState<ASomethingPartyGameState>()->MulticastMove(Character, CurrentTile, DiceNumber);
+	}
+}
 
 
 void ASomethingPartyGameMode::StartPlay()
@@ -127,6 +137,7 @@ void ASomethingPartyGameMode::StartPlay()
 	AGameModeBase::StartPlay();
 }
 
+
 void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
@@ -137,3 +148,4 @@ void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerCont
 		GetWorld()->SpawnActor<ADice>(DiceActor, NewPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), NewPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
 }
+
