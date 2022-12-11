@@ -3,3 +3,8 @@
 
 #include "SomethingPartyPlayerState.h"
 
+void ASomethingPartyPlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+	WaitingToRoll = true;
+}

@@ -6,12 +6,10 @@
 #include "GameFramework/PlayerState.h"
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 #include <SomethingParty/SomethingPartyGameMode.h>
-<<<<<<< Updated upstream
-=======
 #include <SomethingPartyPlayerState.h>
 #include "Components/TextBlock.h"
 #include <DiceNumberWidget.h>
->>>>>>> Stashed changes
+#include <SomethingPartyPlayerState.h>
 
 
 // Sets default values
@@ -54,9 +52,6 @@ void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 	if (Character) {
 		if (HasAuthority())
 			Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode())->RollDice(Character, this);
-<<<<<<< Updated upstream
-		//Character->Move(DiceNumber);
-=======
 		ASomethingPartyPlayerState* playerState = Character->GetPlayerState<ASomethingPartyPlayerState>();
 		UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(Character->GetDiceNumberWidget()->GetWidget());
 		if (DiceNumWidget->DiceNumberText) {
@@ -67,7 +62,6 @@ void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 			playerState->WaitingToRoll = false;
 		}
 		
->>>>>>> Stashed changes
 		Destroy();
 	}
 	

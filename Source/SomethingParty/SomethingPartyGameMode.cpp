@@ -7,15 +7,14 @@
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include <SomethingPartyGameState.h>
+#include <Dice.h>
 #include "GameFramework/PlayerState.h"
-<<<<<<< Updated upstream
-=======
 #include <SomethingPartyPlayerState.h>
 #include <DiceNumberWidget.h>
->>>>>>> Stashed changes
 
 ASomethingPartyGameMode::ASomethingPartyGameMode()
 {
+	bUseSeamlessTravel = true;
 	// use our custom PlayerController class
 	PlayerControllerClass = ASomethingPartyPlayerController::StaticClass();
 
@@ -46,15 +45,12 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 	{
 		PlayerStateClass = SomethingPartyPlayerState.Class;
 	}
-<<<<<<< Updated upstream
-=======
 
 	static ConstructorHelpers::FClassFinder<ADice> Dice(TEXT("/Game/TopDown/Blueprints/DiceActorBP"));
 	if (Dice.Class != NULL)
 	{
 		DiceActor = Dice.Class;
 	}
->>>>>>> Stashed changes
 }
 
 void ASomethingPartyGameMode::NextTurn()
@@ -65,19 +61,16 @@ void ASomethingPartyGameMode::NextTurn()
 	}
 }
 
-void ASomethingPartyGameMode::SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder)
+void ASomethingPartyGameMode::SetTurnOrder(TArray<ASomethingPartyPlayerState*> Order)
 {
 	ASomethingPartyGameState* MainGameState = Cast<ASomethingPartyGameState>(GameState);
 	if (MainGameState) {
-		MainGameState->SetTurnOrder(IDOrder);
+		MainGameState->SetTurnOrder(Order);
 	}
 }
 
 void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADice* Dice)
 {
-<<<<<<< Updated upstream
-	GetGameState<ASomethingPartyGameState>()->RollDice(Character, Dice);
-=======
 	if (Character) {
 		if (!Character->isMoving()) {
 			int DiceNumber = FMath::RandRange(1, 10);
@@ -88,7 +81,6 @@ void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADic
 			
 		}
 	}
->>>>>>> Stashed changes
 }
 
 void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber)
@@ -124,12 +116,11 @@ void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character,
 }
 
 
-
 void ASomethingPartyGameMode::StartPlay()
 {
 
 	
-
+	DecidingTurns = true;
 	TArray<AActor*> ActorsToFind;
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), ATileActor::StaticClass(), FName("StartingTile"), ActorsToFind);
 
@@ -142,10 +133,10 @@ void ASomethingPartyGameMode::StartPlay()
 			GetGameState<ASomethingPartyGameState>()->StartTile = Tile;
 		}
 	}
+	
 	AGameModeBase::StartPlay();
 }
-<<<<<<< Updated upstream
-=======
+
 
 void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
@@ -158,5 +149,3 @@ void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerCont
 	}
 }
 
-
->>>>>>> Stashed changes
