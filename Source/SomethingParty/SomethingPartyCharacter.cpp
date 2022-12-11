@@ -19,6 +19,8 @@
 #include <SomethingPartyPlayerState.h>
 #include "GameFramework/PlayerState.h"
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
+#include <SplitTileActor.h>
+#include <Components/WidgetComponent.h>
 
 ASomethingPartyCharacter::ASomethingPartyCharacter()
 {
@@ -53,7 +55,8 @@ ASomethingPartyCharacter::ASomethingPartyCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-
+	DiceNumberWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DiceNumber"));
+	DiceNumberWidget->SetupAttachment(RootComponent);
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
@@ -137,9 +140,14 @@ void ASomethingPartyCharacter::CreateMoveSpline(ATileActor* SplineStartTile, int
 		for (int i = 0; i < amount; i++) {
 			MovementSpline->AddSplinePoint(nextTilePoint->GetActorLocation(), ESplineCoordinateSpace::World, false); //Add spline point for each tile
 			CurrentTile = nextTilePoint;
+			if (Cast<ASplitTileActor>(CurrentTile)) {
+				Cast<ASplitTileActor>(CurrentTile)->SetRemainingTiles(amount - i);
+				break;
+			}
 			if (nextTilePoint->getNextTile() == NULL) { //If there is no tile after, end spline
 				break;
 			}
+			
 			nextTilePoint = nextTilePoint->getNextTile(); //Set nextTilePoint to next tile
 		}
 	}
@@ -159,6 +167,11 @@ void ASomethingPartyCharacter::Move()
 	MovementTimeline.SetPlayRate(1.f / TimelineLength);
 	MovementTimeline.PlayFromStart();
 
+}
+
+UWidgetComponent* ASomethingPartyCharacter::GetDiceNumberWidget()
+{
+	return DiceNumberWidget;
 }
 
 
@@ -185,10 +198,12 @@ void ASomethingPartyCharacter::OnEndReached()
 	//If tile is triggerable, then trigger action
 	if (CurrentTile->Implements<UTriggerableTileInterface>()) {
 		ITriggerableTileInterface* TriggerableTile = Cast<ITriggerableTileInterface>(CurrentTile);
-		TriggerableTile->triggerAction();
+		TriggerableTile->TriggerAction(this);
 	}
-	ASomethingPartyGameState* gs = Cast<ASomethingPartyGameState>(GetWorld()->GetGameState());
-	gs->NextTurn();
+	else {
+		ASomethingPartyGameState* gs = Cast<ASomethingPartyGameState>(GetWorld()->GetGameState());
+		gs->NextTurn();
+	}
 }
 
 void ASomethingPartyCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const

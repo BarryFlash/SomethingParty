@@ -8,6 +8,11 @@
 #include "Kismet/GameplayStatics.h"
 #include <SomethingPartyGameState.h>
 #include "GameFramework/PlayerState.h"
+<<<<<<< Updated upstream
+=======
+#include <SomethingPartyPlayerState.h>
+#include <DiceNumberWidget.h>
+>>>>>>> Stashed changes
 
 ASomethingPartyGameMode::ASomethingPartyGameMode()
 {
@@ -41,6 +46,15 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 	{
 		PlayerStateClass = SomethingPartyPlayerState.Class;
 	}
+<<<<<<< Updated upstream
+=======
+
+	static ConstructorHelpers::FClassFinder<ADice> Dice(TEXT("/Game/TopDown/Blueprints/DiceActorBP"));
+	if (Dice.Class != NULL)
+	{
+		DiceActor = Dice.Class;
+	}
+>>>>>>> Stashed changes
 }
 
 void ASomethingPartyGameMode::NextTurn()
@@ -61,10 +75,53 @@ void ASomethingPartyGameMode::SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder)
 
 void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADice* Dice)
 {
+<<<<<<< Updated upstream
 	GetGameState<ASomethingPartyGameState>()->RollDice(Character, Dice);
+=======
+	if (Character) {
+		if (!Character->isMoving()) {
+			int DiceNumber = FMath::RandRange(1, 10);
+			Dice->DiceNumber = DiceNumber;
+			FTimerDelegate Delegate;
+			Delegate.BindUFunction(this, "AfterRollDice", Character, DiceNumber);
+			GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
+			
+		}
+	}
+>>>>>>> Stashed changes
 }
 
+void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber)
+{
+	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(Character->GetDiceNumberWidget()->GetWidget());
+	if (DiceNumWidget->DiceNumberText) {
+		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	if (DecidingTurns) {
+		StartingTurnOrder.Add(DiceNumber, Character->GetPlayerState<ASomethingPartyPlayerState>());
+		if (StartingTurnOrder.Num() == GetGameState<ASomethingPartyGameState>()->PlayerArray.Num()) {
+			StartingTurnOrder.KeySort([](int A, int B) {
+				return A > B;
+				});
+			TArray<ASomethingPartyPlayerState*> NewTurnOrder;
+			for (auto& Elem : StartingTurnOrder) {
+				NewTurnOrder.Add(Elem.Value);
+			}
+			SetTurnOrder(NewTurnOrder);
+			DecidingTurns = false;
+			GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPlayerController()->GetCharacter()->SetActorLocation(GetGameState<ASomethingPartyGameState>()->StartTile->GetActorLocation());
+			FActorSpawnParameters spawnParams;
+			spawnParams.Owner = GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn();
+			GetWorld()->SpawnActor<ADice>(DiceActor, GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 180), GetGameState<ASomethingPartyGameState>()->CurrentTurnPlayer->GetPawn()->GetActorRotation(), spawnParams);
 
+		}
+	}
+	else {
+		ATileActor* CurrentTile = Character->CurrentTile;
+		Character->CreateMoveSpline(CurrentTile, DiceNumber);
+		GetGameState<ASomethingPartyGameState>()->MulticastMove(Character, CurrentTile, DiceNumber);
+	}
+}
 
 
 
@@ -87,3 +144,19 @@ void ASomethingPartyGameMode::StartPlay()
 	}
 	AGameModeBase::StartPlay();
 }
+<<<<<<< Updated upstream
+=======
+
+void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	if (DiceActor && NewPlayer->GetPawn()) {
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = NewPlayer->GetPawn();
+		GetWorld()->SpawnActor<ADice>(DiceActor, NewPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), NewPlayer->GetPawn()->GetActorRotation(), spawnParams);
+	}
+}
+
+
+>>>>>>> Stashed changes

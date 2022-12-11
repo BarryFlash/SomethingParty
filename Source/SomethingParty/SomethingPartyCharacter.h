@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include <TileActor.h>
 #include <Runtime/Engine/Classes/Components/TimelineComponent.h>
+#include <Components/WidgetComponent.h>
 #include "SomethingPartyCharacter.generated.h"
 
 
@@ -36,12 +37,14 @@ public:
 
 	ATileActor* CurrentTile;
 
+	UWidgetComponent* GetDiceNumberWidget();
 	
 
 protected:
 	class USplineComponent* MovementSpline;
 
-
+	UPROPERTY(VisibleAnywhere, Category = "Dice")
+	UWidgetComponent* DiceNumberWidget;
 	
 	UPROPERTY(Replicated)
 	bool moving;

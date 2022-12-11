@@ -4,33 +4,39 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Dice.generated.h"
+#include "ArrowSelectActor.generated.h"
 
 UCLASS()
-class ADice : public AActor
+class AArrowSelectActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ADice();
+	AArrowSelectActor();
 
-	UPROPERTY(Replicated)
-		int DiceNumber;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
-	USkeletalMeshComponent* DiceMesh;
+	UStaticMeshComponent* ArrowMesh;
+
+	class UMaterialInstanceDynamic* ArrowDynamicMaterial;
 
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void EnableOutline(UPrimitiveComponent* TouchedComponent);
 
-	
+	UFUNCTION()
+	void DisableOutline(UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void SelectArrow(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	int PathIndex;
 
 };

@@ -14,7 +14,8 @@ ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 {
 	// set our turn rates for input
 	TurnRateGamepad = 45.f;
-
+	bEnableMouseOverEvents = true;
+	bShowMouseCursor = true;
 
 }
 
@@ -94,6 +95,7 @@ void ASomethingPartyPlayerController::LookUpAtRate(float Rate)
 
 void ASomethingPartyPlayerController::Jump()
 {
+	bShowMouseCursor = true;
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
 	{

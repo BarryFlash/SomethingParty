@@ -15,9 +15,9 @@ void ASomethingPartyGameState::NextTurn()
 {
 	CurrentTurn += 1;
 	if (HasAuthority() && CurrentTurn % TurnOrder.Num() == 0) {
-		GetWorld()->ServerTravel("/Game/TopDown/Maps/FloorIsLavaMap?listen");
+		//GetWorld()->GetTimerManager().SetTimer(TransitionTimerHandle, this, &ASomethingPartyGameState::TransitionToLevel, 5, false);
 	}
-	else {
+	//else {
 		if (HasAuthority()) {
 			CurrentTurnPlayer = PlayerArray[TurnOrder[CurrentTurn % TurnOrder.Num()]];
 
@@ -35,7 +35,7 @@ void ASomethingPartyGameState::NextTurn()
 				State->GetPlayerController()->SetViewTarget(Character);
 			}
 		}
-	}
+	//}
 }
 
 void ASomethingPartyGameState::SetTurnOrder(TArray<FUniqueNetIdRepl> IDOrder)
@@ -87,6 +87,11 @@ void ASomethingPartyGameState::RollDice(ASomethingPartyCharacter* Character, ADi
 			MulticastMove(Character, CurrentTile, DiceNumber);
 		}
 	}
+}
+
+void ASomethingPartyGameState::TransitionToLevel()
+{
+	GetWorld()->ServerTravel("/Game/TopDown/Maps/FloorIsLavaMap?listen");
 }
 
 void ASomethingPartyGameState::MulticastMove_Implementation(ASomethingPartyCharacter* Character, ATileActor* CurrentTile, int num)

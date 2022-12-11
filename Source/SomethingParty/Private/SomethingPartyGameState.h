@@ -48,5 +48,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastMove(ASomethingPartyCharacter* Character, ATileActor* CurrentTile, int num);
+protected:
+	FTimerHandle TransitionTimerHandle;
 
+	UFUNCTION()
+		void TransitionToLevel();
 };

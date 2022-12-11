@@ -15,5 +15,5 @@ class ITriggerableTileInterface
 	GENERATED_BODY()
 
 public:
-	virtual void triggerAction();
+	virtual void TriggerAction(class ASomethingPartyCharacter* Character);
 };

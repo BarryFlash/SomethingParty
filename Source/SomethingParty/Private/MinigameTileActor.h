@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "TileActor.h"
 #include "TriggerableTileInterface.h"
+#include <SomethingParty/SomethingPartyCharacter.h>
 #include "MinigameTileActor.generated.h"
 
 
@@ -14,5 +15,5 @@ class AMinigameTileActor : public ATileActor, public ITriggerableTileInterface
 	GENERATED_BODY()
 	
 public:
-	virtual void triggerAction() override;
+	virtual void TriggerAction(ASomethingPartyCharacter* Character) override;
 };
