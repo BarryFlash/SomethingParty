@@ -167,6 +167,6 @@ void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerCont
 		spawnParams.Owner = NewPlayer->GetPawn();
 		GetWorld()->SpawnActor<ADice>(DiceActor, NewPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), NewPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
-	RestartPlayerAtPlayerStart(NewPlayer, FindPlayerStart(NewPlayer));
+	//RestartPlayerAtPlayerStart(NewPlayer, FindPlayerStart(NewPlayer));
 }
 
