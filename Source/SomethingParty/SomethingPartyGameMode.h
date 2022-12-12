@@ -31,6 +31,8 @@ public:
 
 	TMultiMap<int, ASomethingPartyPlayerState*> StartingTurnOrder;
 
+	void Respawn(class ASomethingPartyPlayerController* Controller, FTransform const& SpawnTransform, TSubclassOf<ASomethingPartyCharacter> CharacterClass);
+
 protected:
 	virtual void StartPlay() override;
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
@@ -43,6 +45,10 @@ protected:
 
 	UFUNCTION()
 	APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<APawn> StartSpotPawn;
+	
 };
 
 

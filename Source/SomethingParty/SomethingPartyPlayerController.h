@@ -29,6 +29,10 @@ public:
 	UFUNCTION(Server, Reliable)
 		void SetCharacterClass(FCharacterInfoStruct NewChosenClass);
 
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+		void RequestRespawn(FTransform const& Transform, TSubclassOf<ASomethingPartyCharacter> CharacterClass);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FCharacterInfoStruct ChosenClass;
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */

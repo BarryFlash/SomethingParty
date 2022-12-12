@@ -11,6 +11,7 @@
 #include "GameFramework/PlayerState.h"
 #include <SomethingPartyPlayerState.h>
 #include <SomethingParty/Public/SomethingPartyGameInstance.h>
+#include <SomethingParty/SomethingPartyGameMode.h>
 
 ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 {
@@ -22,6 +23,14 @@ ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 }
 
 
+
+void ASomethingPartyPlayerController::RequestRespawn_Implementation(FTransform const& Transform, TSubclassOf<ASomethingPartyCharacter> CharacterClass)
+{
+	ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode) {
+		GameMode->Respawn(this, Transform, CharacterClass);
+	}
+}
 
 void ASomethingPartyPlayerController::SetupInputComponent()
 {

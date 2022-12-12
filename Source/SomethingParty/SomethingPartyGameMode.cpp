@@ -51,6 +51,12 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 	{
 		DiceActor = Dice.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<APawn> StartSpot(TEXT("/Game/TopDown/Blueprints/StartSpot"));
+	if (StartSpot.Class != NULL)
+	{
+		StartSpotPawn = StartSpot.Class;
+	}
 }
 
 void ASomethingPartyGameMode::NextTurn()
@@ -120,8 +126,13 @@ APawn* ASomethingPartyGameMode::SpawnDefaultPawnFor_Implementation(AController* 
 {
 	ASomethingPartyPlayerController* Controller = Cast<ASomethingPartyPlayerController>(NewPlayer);
 	Controller->GetCharacterClass();
-	UE_LOG(LogTemp, Warning, TEXT("CHARACTER: %s"), *Controller->ChosenClass.Name);
-	return GetWorld()->SpawnActor<ASomethingPartyCharacter>(Controller->ChosenClass.Character, StartSpot->GetActorTransform());
+	return GetWorld()->SpawnActor<APawn>(StartSpotPawn, StartSpot->GetActorTransform());
+}
+
+void ASomethingPartyGameMode::Respawn(ASomethingPartyPlayerController* Controller, FTransform const& SpawnTransform, TSubclassOf<ASomethingPartyCharacter> CharacterClass)
+{
+	ASomethingPartyCharacter* Character = GetWorld()->SpawnActor<ASomethingPartyCharacter>(CharacterClass, SpawnTransform);
+	Controller->Possess(Character);
 }
 
 
