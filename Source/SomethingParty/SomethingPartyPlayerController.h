@@ -23,7 +23,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float TurnRateGamepad;
 
-	UClass* GetCharacterClass();
+	TSubclassOf<ASomethingPartyCharacter> GetCharacterClass();
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;

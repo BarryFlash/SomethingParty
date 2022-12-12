@@ -115,15 +115,14 @@ void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character,
 	}
 }
 
-UClass* ASomethingPartyGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
-{
-	ASomethingPartyPlayerController* Controller = Cast<ASomethingPartyPlayerController>(InController);
-	if (Controller)
-	{
-		return Controller->GetCharacterClass();
-	}
 
-	return DefaultPawnClass;
+APawn* ASomethingPartyGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
+{
+	ASomethingPartyPlayerController* Controller = Cast<ASomethingPartyPlayerController>(NewPlayer);
+	if (Controller->IsLocalController())
+		return GetWorld()->SpawnActor<ASomethingPartyCharacter>(Controller->GetCharacterClass(), StartSpot->GetActorTransform());
+
+	return GetWorld()->SpawnActor<ASomethingPartyCharacter>(DefaultPawnClass, StartSpot->GetActorTransform());
 }
 
 
@@ -158,6 +157,6 @@ void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerCont
 		spawnParams.Owner = NewPlayer->GetPawn();
 		GetWorld()->SpawnActor<ADice>(DiceActor, NewPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), NewPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
-	//RestartPlayer(NewPlayer);
+	RestartPlayerAtPlayerStart(NewPlayer, FindPlayerStart(NewPlayer));
 }
 

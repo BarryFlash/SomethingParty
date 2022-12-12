@@ -40,7 +40,9 @@ protected:
 	UFUNCTION()
 	void AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber);
 
-	UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+
+	UFUNCTION()
+	APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
 };
 
 
