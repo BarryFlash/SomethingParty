@@ -39,6 +39,8 @@ protected:
 
 	UFUNCTION()
 	void AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber);
+
+	UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 };
 
 

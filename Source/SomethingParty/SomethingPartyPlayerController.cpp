@@ -10,6 +10,7 @@
 #include <SomethingPartyGameState.h>
 #include "GameFramework/PlayerState.h"
 #include <SomethingPartyPlayerState.h>
+#include <SomethingParty/Public/SomethingPartyGameInstance.h>
 
 ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 {
@@ -131,4 +132,10 @@ void ASomethingPartyPlayerController::AddControllerPitchInput(float Val)
 	{
 		MyPawn->AddControllerPitchInput(Val);
 	}
+}
+
+UClass* ASomethingPartyPlayerController::GetCharacterClass()
+{
+	ChosenClass = GetGameInstance<USomethingPartyGameInstance>()->ChosenClass;
+	return ChosenClass.Character.Get();
 }

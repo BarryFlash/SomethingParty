@@ -52,7 +52,7 @@ protected:
 
 	
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spline")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
 	UCurveFloat* MovementCurve;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")

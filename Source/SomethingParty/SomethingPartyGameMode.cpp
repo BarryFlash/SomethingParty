@@ -19,10 +19,10 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 	PlayerControllerClass = ASomethingPartyPlayerController::StaticClass();
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/BP_TopDownCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/GoblinCharacter"));
 	if (PlayerPawnBPClass.Class != nullptr)
 	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
+		DefaultPawnClass = ASomethingPartyCharacter::StaticClass();
 	}
 
 	// set default controller to our Blueprinted controller
@@ -115,6 +115,17 @@ void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character,
 	}
 }
 
+UClass* ASomethingPartyGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	ASomethingPartyPlayerController* Controller = Cast<ASomethingPartyPlayerController>(InController);
+	if (Controller)
+	{
+		return Controller->GetCharacterClass();
+	}
+
+	return DefaultPawnClass;
+}
+
 
 void ASomethingPartyGameMode::StartPlay()
 {
@@ -147,5 +158,6 @@ void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerCont
 		spawnParams.Owner = NewPlayer->GetPawn();
 		GetWorld()->SpawnActor<ADice>(DiceActor, NewPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), NewPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
+	//RestartPlayer(NewPlayer);
 }
 
