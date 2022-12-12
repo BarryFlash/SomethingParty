@@ -19,19 +19,10 @@ ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 	TurnRateGamepad = 45.f;
 	bEnableMouseOverEvents = true;
 	bShowMouseCursor = true;
-
+	bReplicates = true;
 }
 
 
-
-void ASomethingPartyPlayerController::RequestRespawn_Implementation(FTransform const& Transform, TSubclassOf<ASomethingPartyCharacter> CharacterClass)
-{
-	ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
-	if (GameMode) {
-		UE_LOG(LogTemp, Warning, TEXT("CHARACTER RESPAWNED: %s"), *CharacterClass->GetName());
-		GameMode->Respawn(this, Transform, CharacterClass);
-	}
-}
 
 void ASomethingPartyPlayerController::SetupInputComponent()
 {
@@ -156,4 +147,15 @@ void ASomethingPartyPlayerController::GetCharacterClass_Implementation()
 void ASomethingPartyPlayerController::SetCharacterClass_Implementation(FCharacterInfoStruct NewChosenClass)
 {
 	ChosenClass = NewChosenClass;
+}
+
+
+void ASomethingPartyPlayerController::RequestRespawn_Implementation(FTransform const& Transform, TSubclassOf<ASomethingPartyCharacter> CharacterClass)
+{
+	UE_LOG(LogTemp, Warning, TEXT("HAS AUTHORITY: %b"), HasAuthority());
+	ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode) {
+		UE_LOG(LogTemp, Warning, TEXT("CHARACTER RESPAWNED: %s"), *CharacterClass->GetName());
+		GameMode->Respawn(this, Transform, CharacterClass);
+	}
 }
