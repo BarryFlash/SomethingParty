@@ -119,10 +119,8 @@ void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character,
 APawn* ASomethingPartyGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
 {
 	ASomethingPartyPlayerController* Controller = Cast<ASomethingPartyPlayerController>(NewPlayer);
-	if (Controller->IsLocalController())
-		return GetWorld()->SpawnActor<ASomethingPartyCharacter>(Controller->GetCharacterClass(), StartSpot->GetActorTransform());
-
-	return GetWorld()->SpawnActor<ASomethingPartyCharacter>(DefaultPawnClass, StartSpot->GetActorTransform());
+	Controller->GetCharacterClass();
+	return GetWorld()->SpawnActor<ASomethingPartyCharacter>(Controller->ChosenClass.Character, StartSpot->GetActorTransform());
 }
 
 

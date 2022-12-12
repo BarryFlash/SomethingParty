@@ -134,9 +134,8 @@ void ASomethingPartyPlayerController::AddControllerPitchInput(float Val)
 	}
 }
 
-TSubclassOf<ASomethingPartyCharacter> ASomethingPartyPlayerController::GetCharacterClass()
+void ASomethingPartyPlayerController::GetCharacterClass_Implementation()
 {
 	
 	ChosenClass = GetGameInstance<USomethingPartyGameInstance>()->ChosenClass;
-	return ChosenClass.Character;
 }
