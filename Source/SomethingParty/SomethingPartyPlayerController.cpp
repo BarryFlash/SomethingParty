@@ -28,6 +28,7 @@ void ASomethingPartyPlayerController::RequestRespawn_Implementation(FTransform c
 {
 	ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
 	if (GameMode) {
+		UE_LOG(LogTemp, Warning, TEXT("CHARACTER RESPAWNED: %s"), *CharacterClass->GetName());
 		GameMode->Respawn(this, Transform, CharacterClass);
 	}
 }
@@ -149,7 +150,7 @@ void ASomethingPartyPlayerController::GetCharacterClass_Implementation()
 {
 	
 	ChosenClass = GetGameInstance<USomethingPartyGameInstance>()->ChosenClass;
-	SetCharacterClass(ChosenClass);
+	//SetCharacterClass(ChosenClass);
 }
 
 void ASomethingPartyPlayerController::SetCharacterClass_Implementation(FCharacterInfoStruct NewChosenClass)
