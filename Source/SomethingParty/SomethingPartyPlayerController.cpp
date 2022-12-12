@@ -22,6 +22,7 @@ ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 }
 
 
+
 void ASomethingPartyPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
@@ -97,6 +98,7 @@ void ASomethingPartyPlayerController::LookUpAtRate(float Rate)
 
 void ASomethingPartyPlayerController::Jump()
 {
+	UE_LOG(LogTemp, Warning, TEXT("CHARACTER LATER: %s"), *ChosenClass.Name);
 	bShowMouseCursor = true;
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
@@ -138,4 +140,10 @@ void ASomethingPartyPlayerController::GetCharacterClass_Implementation()
 {
 	
 	ChosenClass = GetGameInstance<USomethingPartyGameInstance>()->ChosenClass;
+	SetCharacterClass(ChosenClass);
+}
+
+void ASomethingPartyPlayerController::SetCharacterClass_Implementation(FCharacterInfoStruct NewChosenClass)
+{
+	ChosenClass = NewChosenClass;
 }

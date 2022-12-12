@@ -26,6 +26,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void GetCharacterClass();
 
+	UFUNCTION(Server, Reliable)
+		void SetCharacterClass(FCharacterInfoStruct NewChosenClass);
+
 	FCharacterInfoStruct ChosenClass;
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */

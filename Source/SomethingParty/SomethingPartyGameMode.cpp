@@ -120,6 +120,7 @@ APawn* ASomethingPartyGameMode::SpawnDefaultPawnFor_Implementation(AController* 
 {
 	ASomethingPartyPlayerController* Controller = Cast<ASomethingPartyPlayerController>(NewPlayer);
 	Controller->GetCharacterClass();
+	UE_LOG(LogTemp, Warning, TEXT("CHARACTER: %s"), *Controller->ChosenClass.Name);
 	return GetWorld()->SpawnActor<ASomethingPartyCharacter>(Controller->ChosenClass.Character, StartSpot->GetActorTransform());
 }
 
