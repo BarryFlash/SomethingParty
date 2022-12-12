@@ -136,9 +136,7 @@ void ASomethingPartyPlayerController::AddControllerPitchInput(float Val)
 
 TSubclassOf<ASomethingPartyCharacter> ASomethingPartyPlayerController::GetCharacterClass()
 {
-	if (IsLocalController()) {
-		ChosenClass = GetGameInstance<USomethingPartyGameInstance>()->ChosenClass;
-		return ChosenClass.Character;
-	}
-	return ASomethingPartyCharacter::StaticClass();
+	
+	ChosenClass = GetGameInstance<USomethingPartyGameInstance>()->ChosenClass;
+	return ChosenClass.Character;
 }
