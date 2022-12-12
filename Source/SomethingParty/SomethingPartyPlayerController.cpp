@@ -136,6 +136,9 @@ void ASomethingPartyPlayerController::AddControllerPitchInput(float Val)
 
 UClass* ASomethingPartyPlayerController::GetCharacterClass()
 {
-	ChosenClass = GetGameInstance<USomethingPartyGameInstance>()->ChosenClass;
-	return ChosenClass.Character.Get();
+	if (IsLocalController()) {
+		ChosenClass = GetGameInstance<USomethingPartyGameInstance>()->ChosenClass;
+		return ChosenClass.Character.Get();
+	}
+	return ASomethingPartyCharacter::StaticClass();
 }
