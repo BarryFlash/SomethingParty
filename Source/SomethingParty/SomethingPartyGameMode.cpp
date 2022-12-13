@@ -82,7 +82,7 @@ void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADic
 		if (!Character->isMoving()) {
 			int DiceNumber = FMath::RandRange(1, 10);
 			Dice->DiceNumber = DiceNumber;
-			//UpdateDiceNumberWidget(Dice->DiceNumberWidget, DiceNumber, true);
+			UpdateDiceNumberWidget(Dice->DiceNumberWidget, DiceNumber, true);
 			FTimerDelegate Delegate;
 			Delegate.BindUFunction(this, "AfterRollDice", Character, DiceNumber, Dice);
 			GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);

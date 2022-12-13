@@ -33,7 +33,7 @@ public:
 
 	void Respawn(class ASomethingPartyPlayerController* Controller, FTransform const& SpawnTransform, TSubclassOf<ASomethingPartyCharacter> CharacterClass);
 
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(Client, Reliable)
 		void UpdateDiceNumberWidget(class UWidgetComponent* DiceNumberWidget, int NewValue, bool show);
 protected:
 	virtual void StartPlay() override;
