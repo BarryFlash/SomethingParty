@@ -73,6 +73,17 @@ void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 	
 }
 
+void ADice::OnRep_DiceNumber()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ON REP DICE NUMBER: %d"), DiceNumber);
+	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(DiceNumberWidget->GetWidget());
+	DiceMesh->SetVisibility(false);
+	if (DiceNumWidget->DiceNumberText) {
+		DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(DiceNumber)));
+		DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
 
 // Called every frame
 void ADice::Tick(float DeltaTime)
@@ -84,5 +95,13 @@ void ADice::Tick(float DeltaTime)
 USkeletalMeshComponent* ADice::GetMeshComponent()
 {
 	return DiceMesh;
+}
+
+void ADice::SetDiceNumber(int NewDiceNumber)
+{
+	if (HasAuthority()) {
+		DiceNumber = NewDiceNumber;
+		OnRep_DiceNumber();
+	}
 }
 

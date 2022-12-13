@@ -70,6 +70,11 @@ void ASomethingPartyGameState::RollDice(ASomethingPartyCharacter* Character, ADi
 	}
 }
 
+void ASomethingPartyGameState::UpdateDiceNumber_Implementation(ADice* Dice, int DiceNumber)
+{
+	Dice->DiceNumber = DiceNumber;
+}
+
 void ASomethingPartyGameState::TransitionToLevel()
 {
 	GetWorld()->ServerTravel("/Game/TopDown/Maps/FloorIsLavaMap?listen");

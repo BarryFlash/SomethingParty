@@ -80,9 +80,11 @@ void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADic
 {
 	if (Character) {
 		if (!Character->isMoving()) {
+			UE_LOG(LogTemp, Warning, TEXT("HAS AUTHORITY: %s"), HasAuthority() ? TEXT("TRUE") : TEXT("FALSE"));
 			int DiceNumber = FMath::RandRange(1, 10);
-			Dice->DiceNumber = DiceNumber;
-			UpdateDiceNumberWidget(Dice->DiceNumberWidget, DiceNumber, true);
+			Dice->SetDiceNumber(DiceNumber);
+			//GetGameState<ASomethingPartyGameState>()->UpdateDiceNumber(Dice, DiceNumber);
+			//UpdateDiceNumberWidget(Dice->DiceNumberWidget, DiceNumber, true);
 			FTimerDelegate Delegate;
 			Delegate.BindUFunction(this, "AfterRollDice", Character, DiceNumber, Dice);
 			GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);

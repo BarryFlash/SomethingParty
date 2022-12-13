@@ -51,6 +51,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastMove(ASomethingPartyCharacter* Character, ATileActor* CurrentTile, int num);
+
+	UFUNCTION(NetMulticast, Reliable)
+		void UpdateDiceNumber(ADice* Dice, int DiceNumber);
 protected:
 	FTimerHandle TransitionTimerHandle;
 
