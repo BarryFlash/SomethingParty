@@ -7,6 +7,7 @@
 #include <SomethingPartyGameState.h>
 #include "Components/TextBlock.h"
 #include <DiceNumberWidget.h>
+#include <SomethingParty/SomethingPartyGameMode.h>
 
 ASplitTileActor::ASplitTileActor() {
 	static ConstructorHelpers::FClassFinder<AArrowSelectActor> ArrowActorBP(TEXT("/Game/TopDown/Blueprints/ArrowSelectActorBP"));
@@ -15,16 +16,28 @@ ASplitTileActor::ASplitTileActor() {
 		ArrowActor = ArrowActorBP.Class;
 	}
 	bReplicates = true;
+
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
+
+	DiceNumberWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DiceNumber"));
+	DiceNumberWidget->SetupAttachment(RootComponent);
+	DiceNumberWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	DiceNumberWidget->SetDrawSize(FVector2D(100, 150));
+	static ConstructorHelpers::FClassFinder<UUserWidget> DiceResultUI(TEXT("/Game/TopDown/Blueprints/DiceResultUI"));
+	if (DiceResultUI.Class != NULL)
+	{
+		DiceNumberWidget->SetWidgetClass(DiceResultUI.Class);
+	}
 }
 
 
 
 void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 {
-	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(Character->GetDiceNumberWidget()->GetWidget());
-	if (DiceNumWidget->DiceNumberText) {
-		DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(TilesRemaining)));
-		DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
+	if (HasAuthority()) {
+		ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
+		GameMode->UpdateDiceNumberWidget(DiceNumberWidget, TilesRemaining, true);
 	}
 	CharacterOnTile = Character;
 	ArrowActors.Empty();
@@ -40,9 +53,9 @@ void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 
 void ASplitTileActor::SelectPath(int PathIndex)
 {
-	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(CharacterOnTile->GetDiceNumberWidget()->GetWidget());
-	if (DiceNumWidget->DiceNumberText) {
-		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
+	if (HasAuthority()) {
+		ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
+		GameMode->UpdateDiceNumberWidget(DiceNumberWidget, NULL, false);
 	}
 	nextTile = NextTiles[PathIndex];
 	for (AArrowSelectActor* Arrow : ArrowActors) {
@@ -55,6 +68,11 @@ void ASplitTileActor::SelectPath(int PathIndex)
 void ASplitTileActor::SetRemainingTiles(int Remaining)
 {
 	this->TilesRemaining = Remaining;
+}
+
+ASomethingPartyCharacter* ASplitTileActor::GetCharacterOnTile()
+{
+	return CharacterOnTile;
 }
 
 

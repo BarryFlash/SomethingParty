@@ -12,6 +12,7 @@
 #include <SomethingPartyPlayerState.h>
 #include <SomethingParty/Public/SomethingPartyGameInstance.h>
 #include <SomethingParty/SomethingPartyGameMode.h>
+#include <SplitTileActor.h>
 
 ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 {
@@ -23,6 +24,11 @@ ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 }
 
 
+
+void ASomethingPartyPlayerController::SelectTilePath_Implementation(ASplitTileActor* Tile, int PathIndex)
+{
+	Tile->SelectPath(PathIndex);
+}
 
 void ASomethingPartyPlayerController::SetupInputComponent()
 {

@@ -55,16 +55,6 @@ ASomethingPartyCharacter::ASomethingPartyCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	DiceNumberWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DiceNumber"));
-	DiceNumberWidget->SetupAttachment(RootComponent);
-	DiceNumberWidget->SetWidgetSpace(EWidgetSpace::Screen);
-	DiceNumberWidget->SetDrawSize(FVector2D(100, 150));
-	static ConstructorHelpers::FClassFinder<UUserWidget> DiceResultUI(TEXT("/Game/TopDown/Blueprints/DiceResultUI"));
-	if (DiceResultUI.Class != NULL)
-	{
-		DiceNumberWidget->SetWidgetClass(DiceResultUI.Class);
-	}
-
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -185,11 +175,6 @@ void ASomethingPartyCharacter::Move()
 	MovementTimeline.SetPlayRate(1.f / TimelineLength);
 	MovementTimeline.PlayFromStart();
 
-}
-
-UWidgetComponent* ASomethingPartyCharacter::GetDiceNumberWidget()
-{
-	return DiceNumberWidget;
 }
 
 

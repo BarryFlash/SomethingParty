@@ -36,9 +36,12 @@ protected:
 	UPROPERTY()
 	ASomethingPartyCharacter* CharacterOnTile;
 
+	UPROPERTY(VisibleAnywhere, Category = "Dice")
+		class UWidgetComponent* DiceNumberWidget;
+
 public:
 	virtual void TriggerAction(ASomethingPartyCharacter* Character) override;
 	void SelectPath(int PathIndex);
 	void SetRemainingTiles(int Remaining);
-	
+	ASomethingPartyCharacter* GetCharacterOnTile();
 };

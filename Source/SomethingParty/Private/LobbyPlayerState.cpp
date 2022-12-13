@@ -8,12 +8,9 @@
 void ALobbyPlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	APlayerState::CopyProperties(PlayerState);
-	UE_LOG(LogTemp, Warning, TEXT("COPYING PROPERTIES!"));
 	if (IsValid(PlayerState)) {
 		ASomethingPartyPlayerState* GamePlayerState = Cast<ASomethingPartyPlayerState>(PlayerState);
-		
 		if (GamePlayerState) {
-			UE_LOG(LogTemp, Warning, TEXT("COPYING PROPERTIES! OLD: %s"), *CharacterInfo.Name);
 			GamePlayerState->CharacterInfo = CharacterInfo;
 		}
 	}
@@ -21,7 +18,6 @@ void ALobbyPlayerState::CopyProperties(APlayerState* PlayerState)
 
 void ALobbyPlayerState::SetCharacterInfo(FCharacterInfoStruct NewCharacterInfo)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SETTING CHAR INFO: %s"), *NewCharacterInfo.Name);
 	CharacterInfo = NewCharacterInfo;
 }
 

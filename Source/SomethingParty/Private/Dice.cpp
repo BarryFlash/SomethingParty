@@ -26,6 +26,16 @@ ADice::ADice()
 	DiceMesh->SetupAttachment(RootComponent);
 
 	bReplicates = true;
+
+	DiceNumberWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DiceNumber"));
+	DiceNumberWidget->SetupAttachment(RootComponent);
+	DiceNumberWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	DiceNumberWidget->SetDrawSize(FVector2D(100, 150));
+	static ConstructorHelpers::FClassFinder<UUserWidget> DiceResultUI(TEXT("/Game/TopDown/Blueprints/DiceResultUI"));
+	if (DiceResultUI.Class != NULL)
+	{
+		DiceNumberWidget->SetWidgetClass(DiceResultUI.Class);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -53,25 +63,25 @@ void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 		if (HasAuthority())
 			Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode())->RollDice(Character, this);
 		ASomethingPartyPlayerState* playerState = Character->GetPlayerState<ASomethingPartyPlayerState>();
-		UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(Character->GetDiceNumberWidget()->GetWidget());
-		if (DiceNumWidget->DiceNumberText) {
-			DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(DiceNumber)));
-			DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
-		}
 		if (playerState->WaitingToRoll) {
 			playerState->WaitingToRoll = false;
 		}
 		
-		Destroy();
 	}
 	
 	
 }
+
 
 // Called every frame
 void ADice::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+USkeletalMeshComponent* ADice::GetMeshComponent()
+{
+	return DiceMesh;
 }
 

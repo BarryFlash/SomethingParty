@@ -34,6 +34,9 @@ public:
 		*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FCharacterInfoStruct ChosenClass;
+
+	UFUNCTION(Server, Reliable)
+		void SelectTilePath(class ASplitTileActor* Tile, int PathIndex);
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;

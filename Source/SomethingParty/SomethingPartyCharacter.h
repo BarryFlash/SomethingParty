@@ -37,14 +37,10 @@ public:
 
 	ATileActor* CurrentTile;
 
-	UWidgetComponent* GetDiceNumberWidget();
 	
 
 protected:
 	class USplineComponent* MovementSpline;
-
-	UPROPERTY(VisibleAnywhere, Category = "Dice")
-	UWidgetComponent* DiceNumberWidget;
 	
 	UPROPERTY(Replicated)
 	bool moving;
