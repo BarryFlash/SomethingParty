@@ -152,7 +152,7 @@ void ASomethingPartyPlayerController::SetCharacterClass_Implementation(FCharacte
 
 void ASomethingPartyPlayerController::RequestRespawn_Implementation(FTransform const& Transform, TSubclassOf<ASomethingPartyCharacter> CharacterClass)
 {
-	UE_LOG(LogTemp, Warning, TEXT("HAS AUTHORITY: %b"), HasAuthority());
+	UE_LOG(LogTemp, Warning, TEXT("HAS AUTHORITY: %s"), HasAuthority() ? TEXT("TRUE") : TEXT("FALSE"));
 	ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
 	if (GameMode) {
 		UE_LOG(LogTemp, Warning, TEXT("CHARACTER RESPAWNED: %s"), *CharacterClass->GetName());
