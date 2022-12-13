@@ -131,8 +131,10 @@ APawn* ASomethingPartyGameMode::SpawnDefaultPawnFor_Implementation(AController* 
 
 void ASomethingPartyGameMode::Respawn(ASomethingPartyPlayerController* Controller, FTransform const& SpawnTransform, TSubclassOf<ASomethingPartyCharacter> CharacterClass)
 {
-	ASomethingPartyCharacter* Character = GetWorld()->SpawnActor<ASomethingPartyCharacter>(CharacterClass, SpawnTransform);
-	Controller->Possess(Character);
+	if (IsValid(Controller)) {
+		ASomethingPartyCharacter* Character = GetWorld()->SpawnActor<ASomethingPartyCharacter>(CharacterClass, SpawnTransform);
+		Controller->Possess(Character);
+	}
 }
 
 

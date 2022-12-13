@@ -155,7 +155,11 @@ void ASomethingPartyPlayerController::RequestRespawn_Implementation(FTransform c
 	UE_LOG(LogTemp, Warning, TEXT("HAS AUTHORITY: %s"), HasAuthority() ? TEXT("TRUE") : TEXT("FALSE"));
 	ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
 	if (GameMode) {
-		UE_LOG(LogTemp, Warning, TEXT("CHARACTER RESPAWNED: %s"), *CharacterClass->GetName());
-		GameMode->Respawn(this, Transform, CharacterClass);
+		FTimerHandle DelayTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, [&]()
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CHARACTER RESPAWNED: %s"), *CharacterClass->GetName());
+			GameMode->Respawn(this, Transform, CharacterClass);
+		}, 0.2f, false);
 	}
 }
