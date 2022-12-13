@@ -124,9 +124,11 @@ void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character,
 
 APawn* ASomethingPartyGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
 {
-	ASomethingPartyPlayerController* Controller = Cast<ASomethingPartyPlayerController>(NewPlayer);
-	Controller->GetCharacterClass();
-	return GetWorld()->SpawnActor<APawn>(StartSpotPawn, StartSpot->GetActorTransform());
+	//ASomethingPartyPlayerController* Controller = Cast<ASomethingPartyPlayerController>(NewPlayer);
+	//Controller->GetCharacterClass();
+	ASomethingPartyPlayerState* PlayerState = NewPlayer->GetPlayerState<ASomethingPartyPlayerState>();
+	UE_LOG(LogTemp, Warning, TEXT("CHARACTER IN PLAYER STATE: %s"), *PlayerState->CharacterInfo.Name);
+	return GetWorld()->SpawnActor<APawn>(PlayerState->CharacterInfo.Character, StartSpot->GetActorTransform());
 }
 
 void ASomethingPartyGameMode::Respawn(ASomethingPartyPlayerController* Controller, FTransform const& SpawnTransform, TSubclassOf<ASomethingPartyCharacter> CharacterClass)

@@ -4,27 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include <Dice.h>
 #include <SomethingParty/Public/SomethingPartyGameInstance.h>
-#include "SomethingPartyPlayerState.generated.h"
+#include "LobbyPlayerState.generated.h"
 
 
 /**
  * 
  */
 UCLASS()
-class ASomethingPartyPlayerState : public APlayerState
+class ALobbyPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void CopyProperties(APlayerState* PlayerState) override;
+
 public:
-	ADice* Dice;
-	bool WaitingToRoll;
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	FCharacterInfoStruct CharacterInfo;
 
-protected:
-
-	virtual void BeginPlay() override;
-	
+	UFUNCTION(BlueprintCallable)
+		void SetCharacterInfo(FCharacterInfoStruct NewCharacterInfo);
 };

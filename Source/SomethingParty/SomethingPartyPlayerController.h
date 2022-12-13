@@ -23,7 +23,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float TurnRateGamepad;
 
-	UFUNCTION(Client, Reliable)
+	/*UFUNCTION(Client, Reliable)
 	void GetCharacterClass();
 
 	UFUNCTION(Server, Reliable)
@@ -31,7 +31,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 		void RequestRespawn(FTransform const& Transform, TSubclassOf<ASomethingPartyCharacter> CharacterClass);
-
+		*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FCharacterInfoStruct ChosenClass;
 protected:

@@ -2,9 +2,12 @@
 
 
 #include "SomethingPartyPlayerState.h"
+#include <LobbyPlayerState.h>
 
 void ASomethingPartyPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 	WaitingToRoll = true;
 }
+
+
