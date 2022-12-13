@@ -136,6 +136,7 @@ APawn* ASomethingPartyGameMode::SpawnDefaultPawnFor_Implementation(AController* 
 
 void ASomethingPartyGameMode::UpdateDiceNumberWidget_Implementation(UWidgetComponent* DiceNumberWidget, int NewValue, bool show)
 {
+	UE_LOG(LogTemp, Warning, TEXT("TEST"));
 	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(DiceNumberWidget->GetWidget());
 	if (show) {
 		ADice* Dice = Cast<ADice>(DiceNumberWidget->GetOwner());
