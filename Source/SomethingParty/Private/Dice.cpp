@@ -62,13 +62,6 @@ void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 	if (Character) {
 		if (HasAuthority()) {
 			Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode())->RollDice(Character, this);
-
-			UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(DiceNumberWidget->GetWidget());
-			DiceMesh->SetVisibility(false);
-			if (DiceNumWidget->DiceNumberText) {
-				DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(DiceNumber)));
-				DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
-			}
 		}
 		ASomethingPartyPlayerState* playerState = Character->GetPlayerState<ASomethingPartyPlayerState>();
 		if (playerState->WaitingToRoll) {

@@ -143,6 +143,7 @@ void ASomethingPartyGameMode::UpdateDiceNumberWidget_Implementation(UWidgetCompo
 			Dice->GetMeshComponent()->SetVisibility(false);
 		}
 		if (DiceNumWidget->DiceNumberText) {
+			UE_LOG(LogTemp, Warning, TEXT("NEW DICE VALUE: %d"), NewValue);
 			DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(NewValue)));
 			DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
 		}
