@@ -69,7 +69,7 @@ void ADice::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 			DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(DiceNumber)));
 			DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
 		}
-
+		
 		ASomethingPartyPlayerState* playerState = Character->GetPlayerState<ASomethingPartyPlayerState>();
 		if (playerState->WaitingToRoll) {
 			playerState->WaitingToRoll = false;
