@@ -35,6 +35,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 		void UpdateDiceNumberWidget(class UWidgetComponent* DiceNumberWidget, int NewValue, bool show);
+
+	UFUNCTION(NetMulticast, Reliable)
+		void UpdateSplitTileArrowVisibility(class AArrowSelectActor* Arrow, bool bShow);
 protected:
 	virtual void StartPlay() override;
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;

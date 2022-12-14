@@ -9,6 +9,7 @@
 #include <SomethingParty/SomethingPartyCharacter.h>
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 #include <SomethingParty/SomethingPartyGameMode.h>
+#include <ArrowSelectActor.h>
 
 
 
@@ -73,6 +74,12 @@ void ASomethingPartyGameState::RollDice(ASomethingPartyCharacter* Character, ADi
 void ASomethingPartyGameState::UpdateDiceNumber_Implementation(ADice* Dice, int DiceNumber)
 {
 	Dice->DiceNumber = DiceNumber;
+}
+
+void ASomethingPartyGameState::UpdateSplitTileArrowVisibility_Implementation(AArrowSelectActor* Arrow, bool bShow)
+{
+	GetWorld()->GetAuthGameMode<ASomethingPartyGameMode>()->UpdateSplitTileArrowVisibility(Arrow, bShow);
+
 }
 
 void ASomethingPartyGameState::TransitionToLevel()

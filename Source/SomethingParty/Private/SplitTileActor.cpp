@@ -59,8 +59,9 @@ void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 		OnRep_CharacterOnTile();
 	}
 	for (AArrowSelectActor* Arrow : ArrowActors) {
-		Arrow->GetMesh()->SetVisibility(true);
-		Arrow->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		if (!HasAuthority()) {
+			GetWorld()->GetGameState<ASomethingPartyGameState>()->UpdateSplitTileArrowVisibility(Arrow, true);
+		}
 	}
 }
 
@@ -68,8 +69,9 @@ void ASplitTileActor::SelectPath(int PathIndex)
 {
 	nextTile = NextTiles[PathIndex];
 	for (AArrowSelectActor* Arrow : ArrowActors) {
-		Arrow->GetMesh()->SetVisibility(false);
-		Arrow->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (!HasAuthority()) {
+			GetWorld()->GetGameState<ASomethingPartyGameState>()->UpdateSplitTileArrowVisibility(Arrow, false);
+		}
 	}
 	if (HasAuthority()) {
 		CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
@@ -103,8 +105,9 @@ void ASplitTileActor::BeginPlay()
 		FVector DeltaVector = NextTiles[i]->GetActorLocation() - GetActorLocation();
 		AArrowSelectActor* ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
 		ArrowActorInstance->PathIndex = i;
-		ArrowActorInstance->GetMesh()->SetVisibility(false);
-		ArrowActorInstance->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (!HasAuthority()) {
+			GetWorld()->GetGameState<ASomethingPartyGameState>()->UpdateSplitTileArrowVisibility(ArrowActorInstance, false);
+		}
 		ArrowActors.Add(ArrowActorInstance);
 	}
 }

@@ -54,6 +54,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 		void UpdateDiceNumber(ADice* Dice, int DiceNumber);
+
+	UFUNCTION(Server, Reliable)
+		void UpdateSplitTileArrowVisibility(class AArrowSelectActor* Arrow,  bool bShow);
 protected:
 	FTimerHandle TransitionTimerHandle;
 

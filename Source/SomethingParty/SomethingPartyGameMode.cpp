@@ -12,6 +12,7 @@
 #include <SomethingPartyPlayerState.h>
 #include <DiceNumberWidget.h>
 #include "Components/TextBlock.h"
+#include <ArrowSelectActor.h>
 
 ASomethingPartyGameMode::ASomethingPartyGameMode()
 {
@@ -164,6 +165,17 @@ void ASomethingPartyGameMode::Respawn(ASomethingPartyPlayerController* Controlle
 	}
 }
 
+
+void ASomethingPartyGameMode::UpdateSplitTileArrowVisibility_Implementation(AArrowSelectActor* Arrow, bool bShow)
+{
+	Arrow->GetMesh()->SetVisibility(bShow);
+	if (bShow) {
+		Arrow->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+	else {
+		Arrow->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
 
 void ASomethingPartyGameMode::StartPlay()
 {
