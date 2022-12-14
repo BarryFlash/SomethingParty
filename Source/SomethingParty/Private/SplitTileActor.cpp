@@ -50,7 +50,10 @@ void ASplitTileActor::OnRep_CharacterOnTile()
 
 void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 {
-	CharacterOnTile = Character;
+	if (HasAuthority()) {
+		CharacterOnTile = Character;
+		OnRep_CharacterOnTile();
+	}
 	ArrowActors.Empty();
 	for (int i = 0; i < NextTiles.Num(); i++) {
 		FActorSpawnParameters spawnParams;
@@ -71,6 +74,8 @@ void ASplitTileActor::SelectPath(int PathIndex)
 	if (HasAuthority()) {
 		CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
 		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
+		CharacterOnTile = NULL;
+		OnRep_CharacterOnTile();
 	}
 }
 
