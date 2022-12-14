@@ -48,6 +48,7 @@ void ASplitTileActor::OnRep_CharacterOnTile()
 
 }
 
+
 void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 {
 	if (HasAuthority()) {
@@ -71,6 +72,15 @@ void ASplitTileActor::SelectPath(int PathIndex)
 	for (AArrowSelectActor* Arrow : ArrowActors) {
 		Arrow->Destroy();
 	}
+	FTimerDelegate Delegate;
+	Delegate.BindUFunction(this, "StartMoveCharacter");
+	FTimerHandle DelayTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
+	
+}
+
+void ASplitTileActor::StartMoveCharacter()
+{
 	if (HasAuthority()) {
 		CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
 		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);

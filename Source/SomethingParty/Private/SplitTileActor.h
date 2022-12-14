@@ -42,6 +42,8 @@ protected:
 	UFUNCTION()
 		void OnRep_CharacterOnTile();
 
+	UFUNCTION()
+		void StartMoveCharacter();
 public:
 	virtual void TriggerAction(ASomethingPartyCharacter* Character) override;
 	void SelectPath(int PathIndex);
