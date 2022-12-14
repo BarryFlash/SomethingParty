@@ -8,6 +8,7 @@
 #include "Components/TextBlock.h"
 #include <DiceNumberWidget.h>
 #include <SomethingParty/SomethingPartyGameMode.h>
+#include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 
 ASplitTileActor::ASplitTileActor() {
 	static ConstructorHelpers::FClassFinder<AArrowSelectActor> ArrowActorBP(TEXT("/Game/TopDown/Blueprints/ArrowSelectActorBP"));
@@ -33,12 +34,22 @@ ASplitTileActor::ASplitTileActor() {
 
 
 
+void ASplitTileActor::OnRep_CharacterOnTile()
+{
+	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(DiceNumberWidget->GetWidget());
+	if (CharacterOnTile) {
+		if (DiceNumWidget->DiceNumberText) {
+			DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(TilesRemaining)));
+			DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	} else {
+		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+}
+
 void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 {
-	if (HasAuthority()) {
-		ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
-		GameMode->UpdateDiceNumberWidget(DiceNumberWidget, TilesRemaining, true);
-	}
 	CharacterOnTile = Character;
 	ArrowActors.Empty();
 	for (int i = 0; i < NextTiles.Num(); i++) {
@@ -53,16 +64,14 @@ void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 
 void ASplitTileActor::SelectPath(int PathIndex)
 {
-	if (HasAuthority()) {
-		ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
-		GameMode->UpdateDiceNumberWidget(DiceNumberWidget, NULL, false);
-	}
 	nextTile = NextTiles[PathIndex];
 	for (AArrowSelectActor* Arrow : ArrowActors) {
 		Arrow->Destroy();
 	}
-	CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
-	Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
+	if (HasAuthority()) {
+		CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
+		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
+	}
 }
 
 void ASplitTileActor::SetRemainingTiles(int Remaining)
@@ -75,4 +84,10 @@ ASomethingPartyCharacter* ASplitTileActor::GetCharacterOnTile()
 	return CharacterOnTile;
 }
 
+void ASplitTileActor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASplitTileActor, CharacterOnTile);
+}
 
