@@ -50,7 +50,7 @@ void AArrowSelectActor::DisableOutline(UPrimitiveComponent* TouchedComponent)
 {
 	ASplitTileActor* SplitTile = GetOwner<ASplitTileActor>();
 	ASomethingPartyPlayerController* Controller = GetWorld()->GetFirstPlayerController<ASomethingPartyPlayerController>();
-	if (Controller == SplitTile->GetCharacterOnTile()->GetController()) {
+	if (SplitTile->GetCharacterOnTile() && Controller == SplitTile->GetCharacterOnTile()->GetController()) {
 		ArrowDynamicMaterial->SetScalarParameterValue(TEXT("EmissiveMultiplier"), 0);
 		ArrowDynamicMaterial->SetScalarParameterValue(TEXT("HighlightMultiplier"), 1);
 	}
