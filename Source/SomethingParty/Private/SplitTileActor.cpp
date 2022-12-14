@@ -37,13 +37,16 @@ ASplitTileActor::ASplitTileActor() {
 void ASplitTileActor::OnRep_CharacterOnTile()
 {
 	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(DiceNumberWidget->GetWidget());
-	if (CharacterOnTile) {
-		if (DiceNumWidget->DiceNumberText) {
-			DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(TilesRemaining)));
-			DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
+	if (DiceNumWidget) {
+		if (CharacterOnTile) {
+			if (DiceNumWidget->DiceNumberText) {
+				DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(TilesRemaining)));
+				DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
+			}
 		}
-	} else {
-		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
+		else {
+			DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 
 }
