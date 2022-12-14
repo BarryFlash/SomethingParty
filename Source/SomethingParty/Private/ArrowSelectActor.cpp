@@ -73,3 +73,8 @@ void AArrowSelectActor::Tick(float DeltaTime)
 
 }
 
+UStaticMeshComponent* AArrowSelectActor::GetMesh()
+{
+	return ArrowMesh;
+}
+

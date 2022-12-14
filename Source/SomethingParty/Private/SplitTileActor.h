@@ -44,6 +44,8 @@ protected:
 
 	UFUNCTION()
 		void StartMoveCharacter();
+
+	virtual void BeginPlay() override;
 public:
 	virtual void TriggerAction(ASomethingPartyCharacter* Character) override;
 	void SelectPath(int PathIndex);

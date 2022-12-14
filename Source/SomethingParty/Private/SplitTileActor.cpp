@@ -55,29 +55,29 @@ void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 		CharacterOnTile = Character;
 		OnRep_CharacterOnTile();
 	}
-	ArrowActors.Empty();
-	for (int i = 0; i < NextTiles.Num(); i++) {
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		FVector DeltaVector = NextTiles[i]->GetActorLocation() - GetActorLocation();
-		AArrowSelectActor* ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
-		ArrowActorInstance->PathIndex = i;
-		ArrowActors.Add(ArrowActorInstance);
+	for (AArrowSelectActor* Arrow : ArrowActors) {
+		Arrow->GetMesh()->SetVisibility(true);
+		Arrow->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 }
 
 void ASplitTileActor::SelectPath(int PathIndex)
 {
 	nextTile = NextTiles[PathIndex];
-	if (HasAuthority()) {
-		for (AArrowSelectActor* Arrow : ArrowActors) {
-			Arrow->Destroy();
-		}
+	for (AArrowSelectActor* Arrow : ArrowActors) {
+		Arrow->GetMesh()->SetVisibility(false);
+		Arrow->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
-	FTimerDelegate Delegate;
-	Delegate.BindUFunction(this, "StartMoveCharacter");
-	FTimerHandle DelayTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
+	if (HasAuthority()) {
+		CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
+		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
+		CharacterOnTile = NULL;
+		OnRep_CharacterOnTile();
+	}
+	//FTimerDelegate Delegate;
+	//Delegate.BindUFunction(this, "StartMoveCharacter");
+	//FTimerHandle DelayTimerHandle;
+	//GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
 	
 }
 
@@ -88,6 +88,21 @@ void ASplitTileActor::StartMoveCharacter()
 		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
 		CharacterOnTile = NULL;
 		OnRep_CharacterOnTile();
+	}
+}
+
+void ASplitTileActor::BeginPlay()
+{
+	ArrowActors.Empty();
+	for (int i = 0; i < NextTiles.Num(); i++) {
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		FVector DeltaVector = NextTiles[i]->GetActorLocation() - GetActorLocation();
+		AArrowSelectActor* ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
+		ArrowActorInstance->PathIndex = i;
+		ArrowActorInstance->GetMesh()->SetVisibility(false);
+		ArrowActorInstance->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ArrowActors.Add(ArrowActorInstance);
 	}
 }
 

@@ -39,4 +39,6 @@ public:
 
 	int PathIndex;
 
+	UStaticMeshComponent* GetMesh();
+
 };
