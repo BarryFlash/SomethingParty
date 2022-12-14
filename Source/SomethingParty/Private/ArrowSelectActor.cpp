@@ -39,7 +39,7 @@ void AArrowSelectActor::EnableOutline(UPrimitiveComponent* TouchedComponent)
 {
 	ASplitTileActor* SplitTile = GetOwner<ASplitTileActor>();
 	ASomethingPartyPlayerController* Controller = GetWorld()->GetFirstPlayerController<ASomethingPartyPlayerController>();
-	if (Controller == SplitTile->GetCharacterOnTile()->GetController()) {
+	if (SplitTile->GetCharacterOnTile() && Controller == SplitTile->GetCharacterOnTile()->GetController()) {
 		ArrowDynamicMaterial->SetScalarParameterValue(TEXT("EmissiveMultiplier"), 20);
 		ArrowDynamicMaterial->SetScalarParameterValue(TEXT("HighlightMultiplier"), 2);
 		//ArrowDynamicMaterial->SetVectorParameterValue(TEXT("Color"), FLinearColor(100, 150, 200));
@@ -61,7 +61,7 @@ void AArrowSelectActor::SelectArrow(UPrimitiveComponent* TouchedComponent, FKey 
 	
 	ASplitTileActor* SplitTile = GetOwner<ASplitTileActor>();
 	ASomethingPartyPlayerController* Controller = GetWorld()->GetFirstPlayerController<ASomethingPartyPlayerController>();
-	if (Controller == SplitTile->GetCharacterOnTile()->GetController()) {
+	if (SplitTile->GetCharacterOnTile() && Controller == SplitTile->GetCharacterOnTile()->GetController()) {
 		Controller->SelectTilePath(SplitTile, PathIndex);
 	}
 }
