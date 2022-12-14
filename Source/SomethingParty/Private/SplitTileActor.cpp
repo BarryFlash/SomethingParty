@@ -69,8 +69,10 @@ void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 void ASplitTileActor::SelectPath(int PathIndex)
 {
 	nextTile = NextTiles[PathIndex];
-	for (AArrowSelectActor* Arrow : ArrowActors) {
-		Arrow->Destroy();
+	if (HasAuthority()) {
+		for (AArrowSelectActor* Arrow : ArrowActors) {
+			Arrow->Destroy();
+		}
 	}
 	FTimerDelegate Delegate;
 	Delegate.BindUFunction(this, "StartMoveCharacter");
