@@ -19,7 +19,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, Category = "Mesh", Replicated)
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	UStaticMeshComponent* ArrowMesh;
 
 	class UMaterialInstanceDynamic* ArrowDynamicMaterial;
@@ -37,6 +37,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(Replicated)
 	int PathIndex;
 
 	UStaticMeshComponent* GetMesh();
