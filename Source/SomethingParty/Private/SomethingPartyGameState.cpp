@@ -76,10 +76,11 @@ void ASomethingPartyGameState::UpdateDiceNumber_Implementation(ADice* Dice, int 
 	Dice->DiceNumber = DiceNumber;
 }
 
-void ASomethingPartyGameState::UpdateSplitTileArrowVisibility_Implementation(AArrowSelectActor* Arrow, bool bShow)
+void ASomethingPartyGameState::DeleteSplitTileArrows_Implementation(const TArray<AArrowSelectActor*> &Arrows)
 {
-	GetWorld()->GetAuthGameMode<ASomethingPartyGameMode>()->UpdateSplitTileArrowVisibility(Arrow, bShow);
-
+	for (AArrowSelectActor* Arrow : Arrows) {
+		Arrow->Destroy();
+	}
 }
 
 void ASomethingPartyGameState::TransitionToLevel()

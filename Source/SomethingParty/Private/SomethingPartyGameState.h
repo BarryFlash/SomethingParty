@@ -8,6 +8,7 @@
 #include <Dice.h>
 #include <SomethingParty/SomethingPartyCharacter.h>
 #include <SomethingPartyPlayerState.h>
+#include <ArrowSelectActor.h>
 #include "SomethingPartyGameState.generated.h"
 
 /**
@@ -55,8 +56,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 		void UpdateDiceNumber(ADice* Dice, int DiceNumber);
 
-	UFUNCTION(Server, Reliable)
-		void UpdateSplitTileArrowVisibility(class AArrowSelectActor* Arrow,  bool bShow);
+	UFUNCTION(NetMulticast, Reliable)
+		void DeleteSplitTileArrows(const TArray<AArrowSelectActor*> &Arrows);
 protected:
 	FTimerHandle TransitionTimerHandle;
 

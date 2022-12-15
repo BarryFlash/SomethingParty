@@ -37,16 +37,13 @@ ASplitTileActor::ASplitTileActor() {
 void ASplitTileActor::OnRep_CharacterOnTile()
 {
 	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(DiceNumberWidget->GetWidget());
-	if (DiceNumWidget) {
-		if (CharacterOnTile) {
-			if (DiceNumWidget->DiceNumberText) {
-				DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(TilesRemaining)));
-				DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
-			}
+	if (CharacterOnTile) {
+		if (DiceNumWidget->DiceNumberText) {
+			DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(TilesRemaining)));
+			DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
 		}
-		else {
-			DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
-		}
+	} else {
+		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 }
@@ -58,31 +55,27 @@ void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 		CharacterOnTile = Character;
 		OnRep_CharacterOnTile();
 	}
-	for (AArrowSelectActor* Arrow : ArrowActors) {
-		if (!HasAuthority()) {
-			GetWorld()->GetGameState<ASomethingPartyGameState>()->UpdateSplitTileArrowVisibility(Arrow, true);
-		}
+	ArrowActors.Empty();
+	for (int i = 0; i < NextTiles.Num(); i++) {
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		FVector DeltaVector = NextTiles[i]->GetActorLocation() - GetActorLocation();
+		AArrowSelectActor* ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
+		ArrowActorInstance->PathIndex = i;
+		ArrowActors.Add(ArrowActorInstance);
 	}
 }
 
 void ASplitTileActor::SelectPath(int PathIndex)
 {
 	nextTile = NextTiles[PathIndex];
-	for (AArrowSelectActor* Arrow : ArrowActors) {
-		if (!HasAuthority()) {
-			GetWorld()->GetGameState<ASomethingPartyGameState>()->UpdateSplitTileArrowVisibility(Arrow, false);
-		}
-	}
 	if (HasAuthority()) {
-		CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
-		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
-		CharacterOnTile = NULL;
-		OnRep_CharacterOnTile();
+		GetWorld()->GetGameState<ASomethingPartyGameState>()->DeleteSplitTileArrows(ArrowActors);
 	}
-	//FTimerDelegate Delegate;
-	//Delegate.BindUFunction(this, "StartMoveCharacter");
-	//FTimerHandle DelayTimerHandle;
-	//GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
+	FTimerDelegate Delegate;
+	Delegate.BindUFunction(this, "StartMoveCharacter");
+	FTimerHandle DelayTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
 	
 }
 
@@ -93,22 +86,6 @@ void ASplitTileActor::StartMoveCharacter()
 		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
 		CharacterOnTile = NULL;
 		OnRep_CharacterOnTile();
-	}
-}
-
-void ASplitTileActor::BeginPlay()
-{
-	ArrowActors.Empty();
-	for (int i = 0; i < NextTiles.Num(); i++) {
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		FVector DeltaVector = NextTiles[i]->GetActorLocation() - GetActorLocation();
-		AArrowSelectActor* ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
-		ArrowActorInstance->PathIndex = i;
-		if (!HasAuthority()) {
-			GetWorld()->GetGameState<ASomethingPartyGameState>()->UpdateSplitTileArrowVisibility(ArrowActorInstance, false);
-		}
-		ArrowActors.Add(ArrowActorInstance);
 	}
 }
 
