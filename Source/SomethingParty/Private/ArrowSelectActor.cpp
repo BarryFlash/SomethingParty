@@ -5,6 +5,7 @@
 #include <Runtime/Engine/Classes/Components/PostProcessComponent.h>
 #include <SplitTileActor.h>
 #include <SomethingParty/SomethingPartyPlayerController.h>
+#include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 
 // Sets default values
 AArrowSelectActor::AArrowSelectActor()
@@ -62,7 +63,9 @@ void AArrowSelectActor::SelectArrow(UPrimitiveComponent* TouchedComponent, FKey 
 	ASplitTileActor* SplitTile = GetOwner<ASplitTileActor>();
 	ASomethingPartyPlayerController* Controller = GetWorld()->GetFirstPlayerController<ASomethingPartyPlayerController>();
 	if (SplitTile->GetCharacterOnTile() && Controller == SplitTile->GetCharacterOnTile()->GetController()) {
-		Controller->SelectTilePath(SplitTile, PathIndex);
+		if (!HasAuthority()) {
+			Controller->SelectTilePath(SplitTile, PathIndex);
+		}
 	}
 }
 
@@ -78,3 +81,9 @@ UStaticMeshComponent* AArrowSelectActor::GetMesh()
 	return ArrowMesh;
 }
 
+void AArrowSelectActor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AArrowSelectActor, PathIndex);
+}

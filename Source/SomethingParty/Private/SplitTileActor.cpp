@@ -61,9 +61,9 @@ void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 		spawnParams.Owner = this;
 		FVector DeltaVector = NextTiles[i]->GetActorLocation() - GetActorLocation();
 		AArrowSelectActor* ArrowActorInstance = nullptr;
-		if (HasAuthority())
+		//ArrowActor not updated on client
+		if (HasAuthority()) {
 			ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
-		if (ArrowActorInstance) {
 			ArrowActorInstance->PathIndex = i;
 			ArrowActors.Add(ArrowActorInstance);
 		}
@@ -81,8 +81,13 @@ void ASplitTileActor::SelectPath(int PathIndex)
 	FTimerDelegate Delegate;
 	Delegate.BindUFunction(this, "StartMoveCharacter");
 	FTimerHandle DelayTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
-	
+	//GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
+	if (HasAuthority()) {
+		CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
+		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
+		CharacterOnTile = NULL;
+		OnRep_CharacterOnTile();
+	}
 }
 
 void ASplitTileActor::StartMoveCharacter()

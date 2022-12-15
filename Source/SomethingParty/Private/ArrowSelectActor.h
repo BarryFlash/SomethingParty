@@ -19,7 +19,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, Category = "Mesh")
+	UPROPERTY(VisibleAnywhere, Category = "Mesh", Replicated)
 	UStaticMeshComponent* ArrowMesh;
 
 	class UMaterialInstanceDynamic* ArrowDynamicMaterial;
