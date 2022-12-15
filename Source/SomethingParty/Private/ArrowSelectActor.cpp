@@ -63,9 +63,11 @@ void AArrowSelectActor::SelectArrow(UPrimitiveComponent* TouchedComponent, FKey 
 	ASplitTileActor* SplitTile = GetOwner<ASplitTileActor>();
 	ASomethingPartyPlayerController* Controller = GetWorld()->GetFirstPlayerController<ASomethingPartyPlayerController>();
 	if (SplitTile->GetCharacterOnTile() && Controller == SplitTile->GetCharacterOnTile()->GetController()) {
-		if (HasAuthority()) {
+		if (!HasAuthority()) {
+			Controller->SelectTilePath(SplitTile, PathIndex);
+		}
+		else {
 			SplitTile->SelectPath(PathIndex);
-			//Controller->SelectTilePath(SplitTile, PathIndex);
 		}
 	}
 }
@@ -80,4 +82,11 @@ void AArrowSelectActor::Tick(float DeltaTime)
 UStaticMeshComponent* AArrowSelectActor::GetMesh()
 {
 	return ArrowMesh;
+}
+
+void AArrowSelectActor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AArrowSelectActor, PathIndex);
 }

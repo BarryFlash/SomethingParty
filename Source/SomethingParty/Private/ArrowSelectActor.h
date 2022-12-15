@@ -37,7 +37,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	int PathIndex;
 
 	UStaticMeshComponent* GetMesh();
