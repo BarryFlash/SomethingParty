@@ -60,9 +60,13 @@ void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		FVector DeltaVector = NextTiles[i]->GetActorLocation() - GetActorLocation();
-		AArrowSelectActor* ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
-		ArrowActorInstance->PathIndex = i;
-		ArrowActors.Add(ArrowActorInstance);
+		AArrowSelectActor* ArrowActorInstance = nullptr;
+		if (HasAuthority())
+			ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
+		if (ArrowActorInstance) {
+			ArrowActorInstance->PathIndex = i;
+			ArrowActors.Add(ArrowActorInstance);
+		}
 	}
 }
 
@@ -70,7 +74,9 @@ void ASplitTileActor::SelectPath(int PathIndex)
 {
 	nextTile = NextTiles[PathIndex];
 	if (HasAuthority()) {
-		GetWorld()->GetGameState<ASomethingPartyGameState>()->DeleteSplitTileArrows(ArrowActors);
+		for (AArrowSelectActor* Arrow : ArrowActors) {
+			Arrow->Destroy();
+		}
 	}
 	FTimerDelegate Delegate;
 	Delegate.BindUFunction(this, "StartMoveCharacter");
