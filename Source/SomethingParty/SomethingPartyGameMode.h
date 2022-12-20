@@ -31,6 +31,11 @@ public:
 
 	TMultiMap<int, ASomethingPartyPlayerState*> StartingTurnOrder;
 
+	void Respawn(class ASomethingPartyPlayerController* Controller, FTransform const& SpawnTransform, TSubclassOf<ASomethingPartyCharacter> CharacterClass);
+
+	UFUNCTION(NetMulticast, Reliable)
+		void UpdateDiceNumberWidget(class UWidgetComponent* DiceNumberWidget, int NewValue, bool show);
+
 protected:
 	virtual void StartPlay() override;
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
@@ -38,7 +43,17 @@ protected:
 	FTimerHandle DelayTimerHandle;
 
 	UFUNCTION()
-	void AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber);
+	void AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber, ADice* Dice);
+
+
+	UFUNCTION()
+	APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<APawn> StartSpotPawn;
+
+	
+	
 };
 
 

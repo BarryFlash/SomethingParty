@@ -37,14 +37,10 @@ public:
 
 	ATileActor* CurrentTile;
 
-	UWidgetComponent* GetDiceNumberWidget();
 	
 
 protected:
 	class USplineComponent* MovementSpline;
-
-	UPROPERTY(VisibleAnywhere, Category = "Dice")
-	UWidgetComponent* DiceNumberWidget;
 	
 	UPROPERTY(Replicated)
 	bool moving;
@@ -52,7 +48,7 @@ protected:
 
 	
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spline")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
 	UCurveFloat* MovementCurve;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")

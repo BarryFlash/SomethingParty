@@ -11,6 +11,7 @@
 #include "GameFramework/PlayerState.h"
 #include <SomethingPartyPlayerState.h>
 #include <DiceNumberWidget.h>
+#include "Components/TextBlock.h"
 
 ASomethingPartyGameMode::ASomethingPartyGameMode()
 {
@@ -19,10 +20,10 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 	PlayerControllerClass = ASomethingPartyPlayerController::StaticClass();
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/BP_TopDownCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/GoblinCharacter"));
 	if (PlayerPawnBPClass.Class != nullptr)
 	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
+		DefaultPawnClass = ASomethingPartyCharacter::StaticClass();
 	}
 
 	// set default controller to our Blueprinted controller
@@ -51,6 +52,12 @@ ASomethingPartyGameMode::ASomethingPartyGameMode()
 	{
 		DiceActor = Dice.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<APawn> StartSpot(TEXT("/Game/TopDown/Blueprints/StartSpot"));
+	if (StartSpot.Class != NULL)
+	{
+		StartSpotPawn = StartSpot.Class;
+	}
 }
 
 void ASomethingPartyGameMode::NextTurn()
@@ -73,22 +80,22 @@ void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADic
 {
 	if (Character) {
 		if (!Character->isMoving()) {
+			UE_LOG(LogTemp, Warning, TEXT("HAS AUTHORITY: %s"), HasAuthority() ? TEXT("TRUE") : TEXT("FALSE"));
 			int DiceNumber = FMath::RandRange(1, 10);
-			Dice->DiceNumber = DiceNumber;
+			Dice->SetDiceNumber(DiceNumber);
+			//GetGameState<ASomethingPartyGameState>()->UpdateDiceNumber(Dice, DiceNumber);
+			//UpdateDiceNumberWidget(Dice->DiceNumberWidget, DiceNumber, true);
 			FTimerDelegate Delegate;
-			Delegate.BindUFunction(this, "AfterRollDice", Character, DiceNumber);
+			Delegate.BindUFunction(this, "AfterRollDice", Character, DiceNumber, Dice);
 			GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
 			
 		}
 	}
 }
 
-void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber)
+void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character, int DiceNumber, ADice* Dice)
 {
-	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(Character->GetDiceNumberWidget()->GetWidget());
-	if (DiceNumWidget->DiceNumberText) {
-		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
+	Dice->Destroy();
 	if (DecidingTurns) {
 		StartingTurnOrder.Add(DiceNumber, Character->GetPlayerState<ASomethingPartyPlayerState>());
 		if (StartingTurnOrder.Num() == GetGameState<ASomethingPartyGameState>()->PlayerArray.Num()) {
@@ -112,6 +119,48 @@ void ASomethingPartyGameMode::AfterRollDice(ASomethingPartyCharacter* Character,
 		ATileActor* CurrentTile = Character->CurrentTile;
 		Character->CreateMoveSpline(CurrentTile, DiceNumber);
 		GetGameState<ASomethingPartyGameState>()->MulticastMove(Character, CurrentTile, DiceNumber);
+	}
+}
+
+
+APawn* ASomethingPartyGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
+{
+	//ASomethingPartyPlayerController* Controller = Cast<ASomethingPartyPlayerController>(NewPlayer);
+	//Controller->GetCharacterClass();
+	ASomethingPartyPlayerState* PlayerState = NewPlayer->GetPlayerState<ASomethingPartyPlayerState>();
+	if (PlayerState->CharacterInfo.Character) {
+		return GetWorld()->SpawnActor<APawn>(PlayerState->CharacterInfo.Character, StartSpot->GetActorTransform());
+	}
+	else {
+		return GetWorld()->SpawnActor<APawn>(ASomethingPartyCharacter::StaticClass(), StartSpot->GetActorTransform());
+	}
+}
+
+void ASomethingPartyGameMode::UpdateDiceNumberWidget_Implementation(UWidgetComponent* DiceNumberWidget, int NewValue, bool show)
+{
+	UE_LOG(LogTemp, Warning, TEXT("TEST"));
+	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(DiceNumberWidget->GetWidget());
+	if (show) {
+		ADice* Dice = Cast<ADice>(DiceNumberWidget->GetOwner());
+		if (Dice) {
+			Dice->GetMeshComponent()->SetVisibility(false);
+		}
+		if (DiceNumWidget->DiceNumberText) {
+			UE_LOG(LogTemp, Warning, TEXT("NEW DICE VALUE: %d"), NewValue);
+			DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(NewValue)));
+			DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+	else {
+		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void ASomethingPartyGameMode::Respawn(ASomethingPartyPlayerController* Controller, FTransform const& SpawnTransform, TSubclassOf<ASomethingPartyCharacter> CharacterClass)
+{
+	if (IsValid(Controller)) {
+		ASomethingPartyCharacter* Character = GetWorld()->SpawnActor<ASomethingPartyCharacter>(CharacterClass, SpawnTransform);
+		Controller->Possess(Character);
 	}
 }
 
@@ -147,5 +196,6 @@ void ASomethingPartyGameMode::HandleStartingNewPlayer_Implementation(APlayerCont
 		spawnParams.Owner = NewPlayer->GetPawn();
 		GetWorld()->SpawnActor<ADice>(DiceActor, NewPlayer->GetPawn()->GetActorLocation() + FVector(0, 0, 150), NewPlayer->GetPawn()->GetActorRotation(), spawnParams);
 	}
+	//RestartPlayerAtPlayerStart(NewPlayer, FindPlayerStart(NewPlayer));
 }
 

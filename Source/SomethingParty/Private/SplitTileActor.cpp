@@ -7,6 +7,8 @@
 #include <SomethingPartyGameState.h>
 #include "Components/TextBlock.h"
 #include <DiceNumberWidget.h>
+#include <SomethingParty/SomethingPartyGameMode.h>
+#include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 
 ASplitTileActor::ASplitTileActor() {
 	static ConstructorHelpers::FClassFinder<AArrowSelectActor> ArrowActorBP(TEXT("/Game/TopDown/Blueprints/ArrowSelectActorBP"));
@@ -15,41 +17,87 @@ ASplitTileActor::ASplitTileActor() {
 		ArrowActor = ArrowActorBP.Class;
 	}
 	bReplicates = true;
+
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
+
+	DiceNumberWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DiceNumber"));
+	DiceNumberWidget->SetupAttachment(RootComponent);
+	DiceNumberWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	DiceNumberWidget->SetDrawSize(FVector2D(100, 150));
+	static ConstructorHelpers::FClassFinder<UUserWidget> DiceResultUI(TEXT("/Game/TopDown/Blueprints/DiceResultUI"));
+	if (DiceResultUI.Class != NULL)
+	{
+		DiceNumberWidget->SetWidgetClass(DiceResultUI.Class);
+	}
 }
 
 
 
+void ASplitTileActor::OnRep_CharacterOnTile()
+{
+	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(DiceNumberWidget->GetWidget());
+	if (CharacterOnTile) {
+		if (DiceNumWidget->DiceNumberText) {
+			DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(TilesRemaining)));
+			DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	} else {
+		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+}
+
+
 void ASplitTileActor::TriggerAction(ASomethingPartyCharacter* Character)
 {
-	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(Character->GetDiceNumberWidget()->GetWidget());
-	if (DiceNumWidget->DiceNumberText) {
-		DiceNumWidget->DiceNumberText->SetText(FText::FromString(FString::FromInt(TilesRemaining)));
-		DiceNumWidget->SetVisibility(ESlateVisibility::Visible);
+	if (HasAuthority()) {
+		CharacterOnTile = Character;
+		OnRep_CharacterOnTile();
 	}
-	CharacterOnTile = Character;
 	ArrowActors.Empty();
 	for (int i = 0; i < NextTiles.Num(); i++) {
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		FVector DeltaVector = NextTiles[i]->GetActorLocation() - GetActorLocation();
-		AArrowSelectActor* ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
-		ArrowActorInstance->PathIndex = i;
-		ArrowActors.Add(ArrowActorInstance);
+		AArrowSelectActor* ArrowActorInstance = nullptr;
+		//ArrowActor not updated on client
+		if (HasAuthority()) {
+			ArrowActorInstance = GetWorld()->SpawnActor<AArrowSelectActor>(ArrowActor, GetActorLocation() + DeltaVector / 2, DeltaVector.Rotation() + FRotator3d::MakeFromEuler(FVector(0, 0, 90)), spawnParams);
+			ArrowActorInstance->PathIndex = i;
+			ArrowActors.Add(ArrowActorInstance);
+		}
 	}
 }
 
 void ASplitTileActor::SelectPath(int PathIndex)
 {
-	UDiceNumberWidget* DiceNumWidget = Cast<UDiceNumberWidget>(CharacterOnTile->GetDiceNumberWidget()->GetWidget());
-	if (DiceNumWidget->DiceNumberText) {
-		DiceNumWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
 	nextTile = NextTiles[PathIndex];
-	for (AArrowSelectActor* Arrow : ArrowActors) {
-		Arrow->Destroy();
+	if (HasAuthority()) {
+		for (AArrowSelectActor* Arrow : ArrowActors) {
+			Arrow->Destroy();
+		}
 	}
-	CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
-	Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
+	FTimerDelegate Delegate;
+	Delegate.BindUFunction(this, "StartMoveCharacter");
+	FTimerHandle DelayTimerHandle;
+	//GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, Delegate, 1, false);
+	if (HasAuthority()) {
+		CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
+		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
+		CharacterOnTile = NULL;
+		OnRep_CharacterOnTile();
+	}
+}
+
+void ASplitTileActor::StartMoveCharacter()
+{
+	if (HasAuthority()) {
+		CharacterOnTile->CreateMoveSpline(this, TilesRemaining);
+		Cast<ASomethingPartyGameState>(GetWorld()->GetGameState())->MulticastMove(CharacterOnTile, this, TilesRemaining);
+		CharacterOnTile = NULL;
+		OnRep_CharacterOnTile();
+	}
 }
 
 void ASplitTileActor::SetRemainingTiles(int Remaining)
@@ -57,4 +105,15 @@ void ASplitTileActor::SetRemainingTiles(int Remaining)
 	this->TilesRemaining = Remaining;
 }
 
+ASomethingPartyCharacter* ASplitTileActor::GetCharacterOnTile()
+{
+	return CharacterOnTile;
+}
+
+void ASplitTileActor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASplitTileActor, CharacterOnTile);
+}
 

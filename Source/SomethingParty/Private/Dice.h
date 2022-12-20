@@ -15,7 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	ADice();
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnRep_DiceNumber)
 		int DiceNumber;
 protected:
 	// Called when the game starts or when spawned
@@ -27,10 +27,16 @@ protected:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	
+	UFUNCTION()
+		void OnRep_DiceNumber();
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(VisibleAnywhere, Category = "Dice")
+	class UWidgetComponent* DiceNumberWidget;
 
+	USkeletalMeshComponent* GetMeshComponent();
+
+	void SetDiceNumber(int NewDiceNumber);
 };

@@ -10,6 +10,9 @@
 #include <SomethingPartyGameState.h>
 #include "GameFramework/PlayerState.h"
 #include <SomethingPartyPlayerState.h>
+#include <SomethingParty/Public/SomethingPartyGameInstance.h>
+#include <SomethingParty/SomethingPartyGameMode.h>
+#include <SplitTileActor.h>
 
 ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 {
@@ -17,9 +20,15 @@ ASomethingPartyPlayerController::ASomethingPartyPlayerController()
 	TurnRateGamepad = 45.f;
 	bEnableMouseOverEvents = true;
 	bShowMouseCursor = true;
-
+	bReplicates = true;
 }
 
+
+
+void ASomethingPartyPlayerController::SelectTilePath_Implementation(ASplitTileActor* Tile, int PathIndex)
+{
+	Tile->SelectPath(PathIndex);
+}
 
 void ASomethingPartyPlayerController::SetupInputComponent()
 {
@@ -96,6 +105,7 @@ void ASomethingPartyPlayerController::LookUpAtRate(float Rate)
 
 void ASomethingPartyPlayerController::Jump()
 {
+	UE_LOG(LogTemp, Warning, TEXT("CHARACTER LATER: %s"), *ChosenClass.Name);
 	bShowMouseCursor = true;
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
@@ -132,3 +142,34 @@ void ASomethingPartyPlayerController::AddControllerPitchInput(float Val)
 		MyPawn->AddControllerPitchInput(Val);
 	}
 }
+
+/*
+
+void ASomethingPartyPlayerController::GetCharacterClass_Implementation()
+{
+	
+	ChosenClass = GetGameInstance<USomethingPartyGameInstance>()->ChosenClass;
+	//SetCharacterClass(ChosenClass);
+}
+
+void ASomethingPartyPlayerController::SetCharacterClass_Implementation(FCharacterInfoStruct NewChosenClass)
+{
+	ChosenClass = NewChosenClass;
+}
+
+
+void ASomethingPartyPlayerController::RequestRespawn_Implementation(FTransform const& Transform, TSubclassOf<ASomethingPartyCharacter> CharacterClass)
+{
+	UE_LOG(LogTemp, Warning, TEXT("HAS AUTHORITY: %s"), HasAuthority() ? TEXT("TRUE") : TEXT("FALSE"));
+	ASomethingPartyGameMode* GameMode = Cast<ASomethingPartyGameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode) {
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindLambda([&]()
+			{
+				UE_LOG(LogTemp, Warning, TEXT("CHARACTER RESPAWNED: %s"), *CharacterClass->GetName());
+				GameMode->Respawn(this, Transform, CharacterClass);
+			});
+		FTimerHandle DelayTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, TimerDelegate, 0.2f, false);
+	}
+}*/

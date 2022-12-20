@@ -4,6 +4,8 @@
 #include "ArrowSelectActor.h"
 #include <Runtime/Engine/Classes/Components/PostProcessComponent.h>
 #include <SplitTileActor.h>
+#include <SomethingParty/SomethingPartyPlayerController.h>
+#include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 
 // Sets default values
 AArrowSelectActor::AArrowSelectActor()
@@ -36,21 +38,38 @@ void AArrowSelectActor::BeginPlay()
 
 void AArrowSelectActor::EnableOutline(UPrimitiveComponent* TouchedComponent)
 {
-	ArrowDynamicMaterial->SetScalarParameterValue(TEXT("EmissiveMultiplier"), 20);
-	ArrowDynamicMaterial->SetScalarParameterValue(TEXT("HighlightMultiplier"), 2);
-	//ArrowDynamicMaterial->SetVectorParameterValue(TEXT("Color"), FLinearColor(100, 150, 200));
+	ASplitTileActor* SplitTile = GetOwner<ASplitTileActor>();
+	ASomethingPartyPlayerController* Controller = GetWorld()->GetFirstPlayerController<ASomethingPartyPlayerController>();
+	if (SplitTile->GetCharacterOnTile() && Controller == SplitTile->GetCharacterOnTile()->GetController()) {
+		ArrowDynamicMaterial->SetScalarParameterValue(TEXT("EmissiveMultiplier"), 20);
+		ArrowDynamicMaterial->SetScalarParameterValue(TEXT("HighlightMultiplier"), 2);
+		//ArrowDynamicMaterial->SetVectorParameterValue(TEXT("Color"), FLinearColor(100, 150, 200));
+	}
 }
 
 void AArrowSelectActor::DisableOutline(UPrimitiveComponent* TouchedComponent)
 {
-	ArrowDynamicMaterial->SetScalarParameterValue(TEXT("EmissiveMultiplier"), 0);
-	ArrowDynamicMaterial->SetScalarParameterValue(TEXT("HighlightMultiplier"), 1);
+	ASplitTileActor* SplitTile = GetOwner<ASplitTileActor>();
+	ASomethingPartyPlayerController* Controller = GetWorld()->GetFirstPlayerController<ASomethingPartyPlayerController>();
+	if (SplitTile->GetCharacterOnTile() && Controller == SplitTile->GetCharacterOnTile()->GetController()) {
+		ArrowDynamicMaterial->SetScalarParameterValue(TEXT("EmissiveMultiplier"), 0);
+		ArrowDynamicMaterial->SetScalarParameterValue(TEXT("HighlightMultiplier"), 1);
+	}
 }
 
 void AArrowSelectActor::SelectArrow(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
 {
+	
 	ASplitTileActor* SplitTile = GetOwner<ASplitTileActor>();
-	SplitTile->SelectPath(PathIndex);
+	ASomethingPartyPlayerController* Controller = GetWorld()->GetFirstPlayerController<ASomethingPartyPlayerController>();
+	if (SplitTile->GetCharacterOnTile() && Controller == SplitTile->GetCharacterOnTile()->GetController()) {
+		if (!HasAuthority()) {
+			Controller->SelectTilePath(SplitTile, PathIndex);
+		}
+		else {
+			SplitTile->SelectPath(PathIndex);
+		}
+	}
 }
 
 // Called every frame
@@ -60,3 +79,14 @@ void AArrowSelectActor::Tick(float DeltaTime)
 
 }
 
+UStaticMeshComponent* AArrowSelectActor::GetMesh()
+{
+	return ArrowMesh;
+}
+
+void AArrowSelectActor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AArrowSelectActor, PathIndex);
+}

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
+#include <SomethingParty/Public/SomethingPartyGameInstance.h>
 #include "SomethingPartyPlayerController.generated.h"
 
 /** Forward declaration to improve compiling times */
@@ -22,7 +23,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float TurnRateGamepad;
 
+	/*UFUNCTION(Client, Reliable)
+	void GetCharacterClass();
 
+	UFUNCTION(Server, Reliable)
+		void SetCharacterClass(FCharacterInfoStruct NewChosenClass);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+		void RequestRespawn(FTransform const& Transform, TSubclassOf<ASomethingPartyCharacter> CharacterClass);
+		*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FCharacterInfoStruct ChosenClass;
+
+	UFUNCTION(Server, Reliable)
+		void SelectTilePath(class ASplitTileActor* Tile, int PathIndex);
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -64,7 +78,7 @@ protected:
 	 */
 	void AddControllerPitchInput(float Val);
 
-
+	
 
 private:
 	bool bInputPressed; // Input is bring pressed

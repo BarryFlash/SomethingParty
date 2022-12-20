@@ -33,12 +33,20 @@ protected:
 
 	int TilesRemaining;
 
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing=OnRep_CharacterOnTile)
 	ASomethingPartyCharacter* CharacterOnTile;
 
+	UPROPERTY(VisibleAnywhere, Category = "Dice")
+		class UWidgetComponent* DiceNumberWidget;
+
+	UFUNCTION()
+		void OnRep_CharacterOnTile();
+
+	UFUNCTION()
+		void StartMoveCharacter();
 public:
 	virtual void TriggerAction(ASomethingPartyCharacter* Character) override;
 	void SelectPath(int PathIndex);
 	void SetRemainingTiles(int Remaining);
-	
+	ASomethingPartyCharacter* GetCharacterOnTile();
 };

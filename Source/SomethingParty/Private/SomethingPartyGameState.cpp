@@ -9,6 +9,7 @@
 #include <SomethingParty/SomethingPartyCharacter.h>
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 #include <SomethingParty/SomethingPartyGameMode.h>
+#include <ArrowSelectActor.h>
 
 
 
@@ -67,6 +68,18 @@ void ASomethingPartyGameState::RollDice(ASomethingPartyCharacter* Character, ADi
 			Character->CreateMoveSpline(CurrentTile, DiceNumber);
 			MulticastMove(Character, CurrentTile, DiceNumber);
 		}
+	}
+}
+
+void ASomethingPartyGameState::UpdateDiceNumber_Implementation(ADice* Dice, int DiceNumber)
+{
+	Dice->DiceNumber = DiceNumber;
+}
+
+void ASomethingPartyGameState::DeleteSplitTileArrows_Implementation(const TArray<AArrowSelectActor*> &Arrows)
+{
+	for (AArrowSelectActor* Arrow : Arrows) {
+		Arrow->Destroy();
 	}
 }
 

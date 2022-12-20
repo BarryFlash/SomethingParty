@@ -46,8 +46,8 @@ ASomethingPartyCharacter::ASomethingPartyCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.f;
-	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
+	CameraBoom->TargetArmLength = 1200.f;
+	CameraBoom->SetRelativeRotation(FRotator(-40.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 	// Create a camera...
@@ -55,12 +55,18 @@ ASomethingPartyCharacter::ASomethingPartyCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	DiceNumberWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DiceNumber"));
-	DiceNumberWidget->SetupAttachment(RootComponent);
-
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	TileWalkSpeed = 500;
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> Curve(TEXT("/Game/TopDown/Blueprints/SplineMovementCurve"));
+	if (Curve.Object != NULL)
+	{
+		MovementCurve = Curve.Object;
+	}
+
 }
 
 void ASomethingPartyCharacter::Tick(float DeltaSeconds)
@@ -118,10 +124,12 @@ void ASomethingPartyCharacter::BeginPlay()
 	if (!SplineActor) {
 		UE_LOG(LogTemp, Fatal, TEXT("No spline actor found..."));
 	}
-	if (SplineActor->GetComponentsByClass(USplineComponent::StaticClass()).Num() != 1) {
+	TInlineComponentArray<USplineComponent*> SplineComponentArray;
+	SplineActor->GetComponents(SplineComponentArray);
+	if (SplineComponentArray.Num() != 1) {
 		UE_LOG(LogTemp, Fatal, TEXT("No spline component found in spline actor..."));
 	}
-	USplineComponent* SplineComponent = Cast<USplineComponent>(SplineActor->GetComponentsByClass(USplineComponent::StaticClass())[0]);
+	USplineComponent* SplineComponent = SplineComponentArray[0];
 	if (!SplineComponent) {
 		UE_LOG(LogTemp, Fatal, TEXT("No spline component found in spline actor..."));
 	}
@@ -167,11 +175,6 @@ void ASomethingPartyCharacter::Move()
 	MovementTimeline.SetPlayRate(1.f / TimelineLength);
 	MovementTimeline.PlayFromStart();
 
-}
-
-UWidgetComponent* ASomethingPartyCharacter::GetDiceNumberWidget()
-{
-	return DiceNumberWidget;
 }
 
 
