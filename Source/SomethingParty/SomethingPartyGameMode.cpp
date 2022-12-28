@@ -80,7 +80,6 @@ void ASomethingPartyGameMode::RollDice(ASomethingPartyCharacter* Character, ADic
 {
 	if (Character) {
 		if (!Character->isMoving()) {
-			UE_LOG(LogTemp, Warning, TEXT("HAS AUTHORITY: %s"), HasAuthority() ? TEXT("TRUE") : TEXT("FALSE"));
 			int DiceNumber = FMath::RandRange(1, 10);
 			Dice->SetDiceNumber(DiceNumber);
 			//GetGameState<ASomethingPartyGameState>()->UpdateDiceNumber(Dice, DiceNumber);
