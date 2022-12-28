@@ -22,7 +22,10 @@ void UHealthComponent::HandleTakeDamage(AActor* DamageActor, float Damage, const
 	}
 
 	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-	//OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
+	//OnHealthChanged.Broadcast(Health);
+	if (Health <= 0) {
+		OnDeath();
+	}
 }
 
 void UHealthComponent::AddHealth(int amount)
@@ -30,20 +33,22 @@ void UHealthComponent::AddHealth(int amount)
 	Health += amount;
 	if (Health > MaxHealth)
 		Health = MaxHealth;
-}
-
-void UHealthComponent::DoDamage(int amount)
-{
-	Health -= amount;
-	if (Health <= 0) {
-		Health = 0;
-		OnDeath();
-	}
+	//OnHealthChanged.Broadcast(Health);
 }
 
 void UHealthComponent::OnDeath()
 {
 	GetOwner()->Destroy();
+}
+
+int UHealthComponent::GetHealth()
+{
+	return Health;
+}
+
+int UHealthComponent::GetMaxHealth()
+{
+	return MaxHealth;
 }
 
 

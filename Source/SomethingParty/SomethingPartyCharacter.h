@@ -46,7 +46,8 @@ protected:
 	bool moving;
 	FTimeline MovementTimeline;
 
-	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UHealthActorComponent* HealthComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
 	UCurveFloat* MovementCurve;

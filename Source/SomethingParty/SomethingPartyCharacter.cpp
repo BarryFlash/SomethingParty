@@ -21,6 +21,7 @@
 #include <Runtime/Engine/Public/Net/UnrealNetwork.h>
 #include <SplitTileActor.h>
 #include <Components/WidgetComponent.h>
+#include <HealthActorComponent.h>
 
 ASomethingPartyCharacter::ASomethingPartyCharacter()
 {
@@ -58,6 +59,9 @@ ASomethingPartyCharacter::ASomethingPartyCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	HealthComponent = CreateDefaultSubobject<UHealthActorComponent>(TEXT("HealthComponent"));
+	AddOwnedComponent(HealthComponent);
 
 	TileWalkSpeed = 500;
 

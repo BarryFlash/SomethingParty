@@ -12,7 +12,6 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
-#include <HealthComponent.h>
 
 // Sets default values
 AMinigameCharacter::AMinigameCharacter()
@@ -57,7 +56,7 @@ AMinigameCharacter::AMinigameCharacter()
 	FirstPersonCameraComponent->SetupAttachment(GetMesh(), TEXT("head"));
 
 	// Create health component...
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	//HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
 
 	// Activate ticking in order to update the cursor every frame.

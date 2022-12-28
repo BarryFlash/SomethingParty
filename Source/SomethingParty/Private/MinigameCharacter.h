@@ -29,8 +29,8 @@ public:
 
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
-		class UHealthComponent* HealthComponent;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+		//class UHealthComponent* HealthComponent;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
